@@ -1,9 +1,10 @@
-import axios from "axios";
+// import axios from "axios";
 import { Field, Form, Formik, ErrorMessage } from "formik";
 import React from "react";
 // import { toast } from "react-toastify";
 import toast from "react-hot-toast";
 import * as yup from "yup";
+import api from "../../../../utils/axios";
 
 const AdminAddProduct = () => {
   const validationSchema = yup.object({
@@ -20,7 +21,7 @@ const AdminAddProduct = () => {
     { setSubmitting, setErrors, resetForm }
   ) => {
     try {
-      await axios.post("http://localhost:8000/products", values);
+      await api.post("/admin/product", values);
       toast.success(`Added "${values.title}" succesfully`);
       resetForm();
       console.log(values);

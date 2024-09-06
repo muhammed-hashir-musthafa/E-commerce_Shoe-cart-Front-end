@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { CartContext } from "../../../User/Componet/Contexts/Contexts";
 import { Link } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
 import { useSelector } from "react-redux";
+import api from "../../../../utils/axios";
 
 export default function AdminHomePage() {
     // const {users} =useContext(CartContext)
@@ -11,15 +12,16 @@ export default function AdminHomePage() {
     const { users } = useSelector((state) => state.usersSlice);
 
     useEffect(()=>{
-        axios.get("http://localhost:8000/User")
+        api.get("/admin/orders")
         .then(res=>{
-            setTotalOrder(res.data)
+          // console.log(res.data.data.length)
+            setTotalOrder(res.data.data.length)
         })
     },[])
 
-    const subTotalOrders =totalOrder.reduce((total,user)=>{
-        return total+=user.orders.length
-    },0)
+    // const subTotalOrders =totalOrder.reduce((total,user)=>{
+    //     return total+=user.orders.length
+    // },0)
 
   return (
     <>
@@ -60,7 +62,7 @@ export default function AdminHomePage() {
         <div className="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
           <div className="flex justify-between mb-6">
             <div>
-              <div className="text-2xl font-semibold mb-1">{subTotalOrders} </div>
+              <div className="text-2xl font-semibold mb-1">{totalOrder} </div>
               <div className="text-sm font-medium text-gray-400">Orders</div>
             </div>
           </div>

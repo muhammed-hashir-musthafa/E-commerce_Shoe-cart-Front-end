@@ -1,4 +1,4 @@
-import axios from "axios";
+// import axios from "axios";
 // import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import { toast } from "react-toastify";
@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import SearchBar from "../../../G-Components/SearchBar/SearchBar";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteUser } from "../../../../Redux/usersSlice/usersSlice";
+import api from "../../../../utils/axios";
 
 export default function UsersLists() {
   const navigate = useNavigate();
@@ -16,8 +17,8 @@ export default function UsersLists() {
   const dispatch = useDispatch();
 
   const handleDeleteUser = (users) => {
-    axios
-      .delete(`http://localhost:8000/User/${users.id}`)
+    api
+      .delete(`/admin/${users.id}/deleteuser`)
       .then(() => {
         dispatch(deleteUser(users));
         toast.success(`User '${users.name}' deleted successfully`);
@@ -45,18 +46,21 @@ export default function UsersLists() {
                 Cart
               </th>
               <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                Order
+              </th>
+              <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
                 Delete
               </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 text-center tracking-wider">
-            {filteredUsers.map((user) => (
-              <tr key={user.id}>
+            {filteredUsers.data?.map((user) => (
+              <tr key={user._id}>
                 <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 ">
-                  {user.id}
+                  {user._id}
                 </td>
                 <td className="sticky left-0 bg-white whitespace-nowrap px-4 py-2 text-gray-700">
-                  {user.name}
+                  {user.username}
                 </td>
                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                   {user.email}

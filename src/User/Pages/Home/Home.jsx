@@ -16,11 +16,12 @@ import { Outlet } from "react-router-dom";
 import profileIcon from "../../../Assets/user-icon.png";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as yup from "yup";
-import axios from "axios";
+// import axios from "axios";
+import api from "../../../../utils/axios";
 import { toast } from "react-toastify";
 import { CartContext } from "../../Componet/Contexts/Contexts";
 import { useSelector, useDispatch } from "react-redux";
-import {  logout } from "../../../../Redux/logSlice/logSlice";
+import { logout } from "../../../../Redux/logSlice/logSlice";
 import { categorize } from "../../../../Redux/productSlice/productSlice";
 
 function classNames(...classes) {
@@ -81,9 +82,7 @@ export default function Home() {
   const handleSubmit = async (values, { resetForm }) => {
     try {
       const user = filteredUsers.find((user) => user.id === userLogin);
-      const preAddress = await axios.get(
-        `http://localhost:8000/User/${user.id}`
-      );
+      const preAddress = await api.get(`/User/${user.id}`);
       // const prevAddress = preAddress.data.address;
       // const prevPin = preAddress.data.pincode
       const currentAddress = Array.isArray(values.address)
@@ -95,8 +94,8 @@ export default function Home() {
       // console.log(pincode);
       // const updatedAddress = [...currentAddress, ...prevAddress];
       // const updatedPincode =[...pincode,...prevPin]
-      await axios
-        .patch(`http://localhost:8000/User/${user.id}`, {
+      await api
+        .patch(`/user/${user.id}`, {
           address: currentAddress,
           pincode: pincode,
         })

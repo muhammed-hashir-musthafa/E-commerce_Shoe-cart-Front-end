@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
 // import { toast } from "react-toastify";
 import toast from "react-hot-toast";
 // import { CartContext } from "../../../User/Componet/Contexts/Contexts";
@@ -10,6 +10,7 @@ import {
   categorize,
   deleteProduct,
 } from "../../../../Redux/productSlice/productSlice";
+import api from "../../../../utils/axios";
 
 export const AdminProductPage = () => {
   const dispatch = useDispatch();
@@ -25,7 +26,7 @@ export const AdminProductPage = () => {
   };
 
   const handleProductRemove = (product) => {
-    axios.delete(`http://localhost:8000/products/${product.id}`).then(() => {
+    api.delete(`/admin/${product.id}/product`).then(() => {
       dispatch(deleteProduct(product));
       toast.success(`Product '${product.title}' Removed`);
     });
@@ -82,8 +83,8 @@ export const AdminProductPage = () => {
             </h3>
 
             <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-              {filteredProducts.map((product) => (
-                <div key={product.id} className="group relative">
+              {filteredProducts.data?.map((product) => (
+                <div key={product._id} className="group relative">
                   <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 sm:h-80 border">
                     <img
                       src={product.imageSrc}

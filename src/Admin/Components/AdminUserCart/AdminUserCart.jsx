@@ -8,9 +8,10 @@ import {
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
 // import { toast } from "react-toastify";
 import toast from "react-hot-toast";
+import api from "../../../../utils/axios";
 
 export default function AdminUserCart() {
   const [users, setUsers] = useState([]);
@@ -24,8 +25,9 @@ export default function AdminUserCart() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/User");
-        setUsers(res.data);
+        const res = await api.get("/admin/userlist");
+        // console.log(res.data.data)
+        setUsers(res.data.data);
         setLoading(false);
       } catch (err) {
         toast.error("Something went wrong", err);
@@ -35,11 +37,11 @@ export default function AdminUserCart() {
     fetchUsers();
   }, []);
 
-  useEffect(() => {
-    if (!loading) {
-      setCart(user.cart);
-    }
-  }, [user, loading]);
+  // useEffect(() => {
+  //   if (!loading) {
+  //     setCart(user.cart);
+  //   }
+  // }, [user, loading]);
 
   const Subtotal = cart.reduce((total, product) => {
     return total + parseFloat(product.price) * product.quantity;

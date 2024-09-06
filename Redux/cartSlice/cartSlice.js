@@ -1,12 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+// import axios from "axios";
+import api from "../../utils/axios";
  
 export const settingCart = createAsyncThunk(
   "cartSlice/settingCart",
   async () => {
     try {
       const id = localStorage.getItem("id");
-      const res = await axios.get(`http://localhost:8000/User/${id}`);
+      const res = await api.get(`/user/${id}`);
       return res.data.cart;
     } catch (error) {
       console.log("something went wrong!");

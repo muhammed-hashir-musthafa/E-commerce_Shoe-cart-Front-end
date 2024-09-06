@@ -8,9 +8,10 @@ import {
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
 // import { toast } from "react-toastify";
 import toast from "react-hot-toast";
+import api from "../../../../utils/axios";
 
 export default function AdminOrderList() {
   const { id } = useParams();
@@ -21,8 +22,9 @@ export default function AdminOrderList() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get(`http://localhost:8000/User/${idNum}`);
-        setOrders(res.data.orders);
+        const res = await api.get(`admin/${idNum}/orders`);
+        console.log(res.data.data);
+        setOrders(res.data.data);
       } catch (err) {
         toast.error("Something went wrong", err);
       }
@@ -77,15 +79,15 @@ export default function AdminOrderList() {
                             Order Details
                           </h1>
                           {orders.map((order, index) => {
-                            const Subtotal = order.Orders.reduce(
-                              (total, product) => {
-                                return (
-                                  total +
-                                  parseFloat(product.price) * product.quantity
-                                );
-                              },
-                              0
-                            );
+                            // const Subtotal = order.Orders.reduce(
+                            //   (total, product) => {
+                            //     return (
+                            //       total +
+                            //       parseFloat(product.price) * product.quantity
+                            //     );
+                            //   },
+                            //   0
+                            // );
 
                             return (
                               <div
@@ -93,21 +95,17 @@ export default function AdminOrderList() {
                                 className="mb-8 p-2 bg-white shadow-lg rounded-lg border-l-4 border-indigo-600"
                               >
                                 <div className="mb-1">
-                                  <p>Customer Name: {order.CustomerName}</p>
-                                  <p>
-                                    Billing Address: {order.DeliveryAddress}
-                                  </p>
-                                  <p>
-                                    Billing Address: {order.DeliveryPincode}
-                                  </p>
+                                  <p>Customer Name: {order.Customer_Name}</p>
+                                  <p>Billing Address: {order.address}</p>
+                                  <p>Billing Pincode: {order.pincode}</p>
                                 </div>
                                 <h2 className="text-base mb-2 text-rose-600">
                                   Items
                                 </h2>
                                 <ul className="space-y-4">
-                                  {order.Orders.map((item) => (
+                                  {order.map((item) => (
                                     <li
-                                      key={item.id}
+                                      key={item._id}
                                       className="items-center space-x-4 p-2 border rounded-lg"
                                     >
                                       <div>
@@ -128,7 +126,7 @@ export default function AdminOrderList() {
                                   ))}
                                 </ul>
                                 <p className="font-semibold my-5 ms-5">
-                                  Paid Amount: {Subtotal}
+                                  Paid Amount: {order.Total_Amount}
                                 </p>
                               </div>
                             );

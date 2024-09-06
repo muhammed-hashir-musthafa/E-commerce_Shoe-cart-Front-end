@@ -1,12 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+// import axios from "axios";
+import api from "../../utils/axios";
 
 export const fetchProducts = createAsyncThunk(
   "productSlice/fetchProducts",
   async () => {
     try {
-      const res = await axios.get("http://localhost:8000/products");
-      // console.log(res.data);
+      const res = await api.get("user/products");
+      // console.log(res.data.data);
       return res.data;
     } catch (error) {
       console.log("something went wrong!");
@@ -25,15 +26,15 @@ const productSlice = createSlice({
   initialState,
   reducers: {
     searchFilter: (state, action) => {
-      state.filteredProducts = state.products.filter((product) =>
+      state.filteredProducts.data = state.products.data.filter((product) =>
         product.title.toLowerCase().includes(action.payload.toLowerCase())
       );
     },
     categorize: (state, action) => {
       if (action.payload === "all") {
-        state.filteredProducts = state.products;
+        state.filteredProducts.data = state.products.data;
       } else {
-        state.filteredProducts = state.products.filter(
+        state.filteredProducts.data = state.products.data.filter(
           (product) => product.category === action.payload
         );
       }

@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import Logo from "../../../Assets/Logo white.png";
 import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
-import axios from "axios";
+// import axios from "axios";
 //  import { toast } from 'react-toastify';
 import toast from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
@@ -10,6 +10,7 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 // import { CartContext } from "../../Componet/Contexts/Contexts";
 import { useDispatch } from "react-redux";
 import { login } from "../../../../Redux/logSlice/logSlice";
+import api from "../../../../utils/axios";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -42,38 +43,71 @@ const LoginPage = () => {
     { setSubmitting, setErrors, resetForm }
   ) => {
     try {
-      const response = await axios.get("http://localhost:8000/User");
-      const NewData = response.data;
-      const existData = NewData.find(
-        (user) =>
-          user.email === values.email && user.password === values.password
-      );
-      const incorrectData = NewData.find(
-        (user) =>
-          user.email === values.email && user.password !== values.password
-      );
-
-      if (existData) {
-        console.log("Login Successfully");
-        setShowPopup(true);
-        setTimeout(() => {
-          setShowPopup(false);
-          localStorage.setItem("id", existData.id);
-          resetForm();
-          if (values.email === "admin@gmail.com") {
-            navigate("/admin");
-          } else {
-            navigate("/");
+      await api
+        .post("/user/login", values)
+        .then((res) => {
+          if (res.status >= 200 && res.status < 300) {
+            setShowPopup(true);
+            setTimeout(() => {
+              setShowPopup(false);
+              localStorage.setItem("id", res.data.data._id);
+              localStorage.setItem("token", res.data.token);
+              resetForm();
+              dispatch(login());
+            }, 1500);
+            console.log(res.data.data.role==='admin')
+            if (res.data.data.role === "admin") {
+              navigate("/admin");
+            } else {
+              navigate("/");
+            }
           }
-          dispatch(login());
-        }, 1500);
-      } else if (incorrectData) {
-        toast.error("username/password is incorrect");
-      } else {
-        resetForm();
-        toast.error("Please Create an account");
-        navigate("/registration");
-      }
+        })
+        .catch((error) => {
+          if (error.response.status === 400) {
+            toast.error("No user found. Please create an account ");
+            navigate("/registration");
+            resetForm();
+          } else if (error.response.status === 401) {
+            toast.error("Incorrect password/username");
+          }
+        });
+
+      // const adminLogin = user.find((user) => user.role === "admin");
+      // console.log(adminLogin);
+
+      // const existData = user.find(
+      //   (user) =>
+      //     user.email === values.email && user.password === values.password
+      // );
+      // console.log(existData,'exist')
+      // const incorrectData = NewData.find(
+      //   (user) =>
+      //     user.email === values.email && user.password !== values.password
+      // );
+      // console.log(incorrectData,'incoreect')
+
+      //     if (existData) {
+      //       console.log("Login Successfully");
+      //       setShowPopup(true);
+      //       setTimeout(() => {
+      //         setShowPopup(false);
+      //         localStorage.setItem("id", existData.id);
+      //         resetForm();
+      //         if (email === "admin@gmail.com") {
+      //           navigate("/admin");
+      //         } else {
+      //           navigate("/");
+      //         }
+      //         dispatch(login());
+      //       }, 1500);
+      //     } else if (incorrectData) {
+      //       toast.error("username/password is incorrect");
+      //     } else {
+      //       resetForm();
+      //       toast.error("Please Create an account");
+      //       navigate("/registration");
+      //     }
     } catch (error) {
       toast.error("Something went wrong");
       setErrors({ submit: error.message });

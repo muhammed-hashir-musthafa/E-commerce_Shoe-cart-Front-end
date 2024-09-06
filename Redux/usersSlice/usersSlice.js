@@ -1,9 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+// import axios from "axios";
+import api from "../../utils/axios";
 
 export const fetchUsers = createAsyncThunk("userslice/fetchUsers", async () => {
   try {
-    const res = await axios.get("http://localhost:8000/User");
+    const res = await api.get("/admin/userlist");
     // console.log(res.data);
     return res.data;
   } catch (error) {

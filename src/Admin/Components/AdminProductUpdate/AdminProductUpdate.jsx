@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import axios from "axios";
+// import axios from "axios";
 import { Field, Form, Formik, ErrorMessage } from "formik";
 // import { toast } from "react-toastify";
 import toast from "react-hot-toast";
@@ -14,6 +14,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Link, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import api from "../../../../utils/axios";
 // import { CartContext } from "../../../User/Componet/Contexts/Contexts";
 
 export default function AdminProductUpdate() {
@@ -41,8 +42,8 @@ export default function AdminProductUpdate() {
       );
 
       if (updated) {
-        await axios.put(`http://localhost:8000/products/${product.id}`, values);
-        toast.success(`Updated "${values.title}" successfully`);
+        await api.patch(`/admin/${product.id}/product`, values);
+        toast.success(`Updated product successfully`);
       } else {
         toast("No changes applied", { icon: "ℹ️" });
       }
