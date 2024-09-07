@@ -42,10 +42,10 @@ const productSlice = createSlice({
     },
     deleteProduct: (state, action) => {
       const productId = action.payload.id;
-      state.products = state.products.filter(
+      state.products.data = state.products.data.filter(
         (product) => product.id !== productId
       );
-      state.filteredProducts = state.filteredProducts.filter(
+      state.filteredProducts.data = state.filteredProducts.data.filter(
         (product) => product.id !== productId
       );
     },

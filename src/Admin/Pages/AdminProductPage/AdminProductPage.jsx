@@ -26,7 +26,7 @@ export const AdminProductPage = () => {
   };
 
   const handleProductRemove = (product) => {
-    api.delete(`/admin/${product.id}/product`).then(() => {
+    api.delete(`/admin/${product._id}/product`).then(() => {
       dispatch(deleteProduct(product));
       toast.success(`Product '${product.title}' Removed`);
     });
@@ -109,7 +109,7 @@ export const AdminProductPage = () => {
                     <div className="text-center">
                       <button
                         onClick={() => {
-                          navigate(`/admin/products/:${product.id}`);
+                          navigate(`/admin/products/:${product._id}`);
                         }}
                         type="button"
                         className="rounded-md bg-indigo-600 w-1/2  py-2  mt-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"

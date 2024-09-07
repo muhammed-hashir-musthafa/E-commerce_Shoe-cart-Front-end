@@ -22,7 +22,7 @@ export default function AdminProductUpdate() {
   // const { products } = useContext(CartContext);
   const { id } = useParams();
   const idNum = id.slice(1);
-  const product = products.find((item) => item.id === idNum);
+  const product = products?.data?.find((item) => item._id === idNum);
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();
 
@@ -42,7 +42,7 @@ export default function AdminProductUpdate() {
       );
 
       if (updated) {
-        await api.patch(`/admin/${product.id}/product`, values);
+        await api.patch(`/admin/${product._id}/product`, values);
         toast.success(`Updated product successfully`);
       } else {
         toast("No changes applied", { icon: "ℹ️" });
@@ -56,7 +56,7 @@ export default function AdminProductUpdate() {
     }
   };
 
-  // console.log(product);
+  console.log(products);
   return (
     <>
       <Transition show={open}>

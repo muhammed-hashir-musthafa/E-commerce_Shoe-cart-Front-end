@@ -1,13 +1,15 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+// import axios from "axios";
+import api from "../../utils/axios";
 
 export const settingWishList = createAsyncThunk(
   "wishlistSlice/settingWishList",
   async () => {
     try {
       const id = localStorage.getItem("id");
-      const res = await axios.get(`http://localhost:8000/User/${id}`);
-      return res.data.wishlist;
+      const res = await api.get(`/admin/userlist`);
+      // console.log(res.data.data)
+      return res.data?.data?.wishlist;
     } catch (error) {
       console.log("Something went wrong!");
       throw error;
@@ -21,7 +23,7 @@ export const addToWishListAsync = createAsyncThunk(
     try {
       const state = getState();
       const id = localStorage.getItem("id");
-      let userWishList = [...state.wishlistSlice.wishlist];
+      let userWishList = [...state.wishlistSlice.wishlist.data];
 
       const existingProductIndex = userWishList.findIndex(
         (item) => item.id === product.id
@@ -33,7 +35,7 @@ export const addToWishListAsync = createAsyncThunk(
         userWishList.push({ ...product });
       }
 
-      await axios.patch(`http://localhost:8000/User/${id}`, {
+      await api.post(`/user/${id}/wishlists`, {
         wishlist: userWishList,
       });
 
@@ -51,11 +53,12 @@ export const removeFromWishListAsync = createAsyncThunk(
     try {
       const state = getState();
       const id = localStorage.getItem("id");
-      let userWishList = [...state.wishlistSlice.wishlist];
+      let userWishList = [...state.wishlistSlice.wishlist.data];
+      console.log(userWishList)
 
       userWishList = userWishList.filter((item) => item.id !== productId);
 
-      await axios.patch(`http://localhost:8000/User/${id}`, {
+      await api.delete(`/user/${id}/wishlists`, {
         wishlist: userWishList,
       });
 

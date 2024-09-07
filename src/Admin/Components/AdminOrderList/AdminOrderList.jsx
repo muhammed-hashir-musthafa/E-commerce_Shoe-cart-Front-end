@@ -16,14 +16,15 @@ import api from "../../../../utils/axios";
 export default function AdminOrderList() {
   const { id } = useParams();
   const idNum = id.slice(1);
+  const userId =localStorage.getItem('id')
   const [open, setOpen] = useState(true);
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await api.get(`admin/${idNum}/orders`);
-        console.log(res.data.data);
+        const res = await api.get(`admin/orders`);
+        // console.log(res.data.data);
         setOrders(res.data.data);
       } catch (err) {
         toast.error("Something went wrong", err);

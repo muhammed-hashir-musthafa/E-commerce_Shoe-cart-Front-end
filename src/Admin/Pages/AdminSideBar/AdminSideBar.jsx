@@ -101,6 +101,13 @@ export const AdminSidebar = () => {
                   >
                     Users List
                   </Link>
+                  <Link
+                    onClick={() => setMobileMenuOpen(false)}
+                    to={"/"}
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                  >
+                    Go to Home
+                  </Link>
                   <div className="py-6">
                     <Link
                       onClick={logout}
@@ -193,6 +200,14 @@ export const AdminSidebar = () => {
                 className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
               >
                 Users List
+              </Link>
+            </li>
+            <li>
+              <Link
+                to={"/"}
+                className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              >
+                Go to Home
               </Link>
             </li>
             <li>

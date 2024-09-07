@@ -10,7 +10,8 @@ export default function AdminHomePage() {
     const [totalOrder,setTotalOrder]=useState([])
     const {products} = useSelector((state) => state.productSlice);
     const { users } = useSelector((state) => state.usersSlice);
-
+  
+    // console.log(products.data)
     useEffect(()=>{
         api.get("/admin/orders")
         .then(res=>{
@@ -30,7 +31,7 @@ export default function AdminHomePage() {
           <div className="flex justify-between mb-6">
             <div>
               <div className="flex items-center mb-1">
-                <div className="text-2xl font-semibold"> {users.length} </div>
+                <div className="text-2xl font-semibold"> {users?.data?.length} </div>
               </div>
               <div className="text-sm font-medium text-gray-400">Users</div>
             </div>
@@ -47,7 +48,7 @@ export default function AdminHomePage() {
           <div className="flex justify-between mb-4">
             <div>
               <div className="flex items-center mb-1">
-                <div className="text-2xl font-semibold"> {products.length}</div>
+                <div className="text-2xl font-semibold"> {products?.data?.length}</div>
               </div>
               <div className="text-sm font-medium text-gray-400">Products</div>
             </div>

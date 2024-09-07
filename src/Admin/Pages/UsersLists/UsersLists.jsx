@@ -18,10 +18,10 @@ export default function UsersLists() {
 
   const handleDeleteUser = (users) => {
     api
-      .delete(`/admin/${users.id}/deleteuser`)
+      .delete(`/admin/${users._id}/deleteuser`)
       .then(() => {
         dispatch(deleteUser(users));
-        toast.success(`User '${users.name}' deleted successfully`);
+        toast.success(`User '${users.username}' deleted successfully`);
       })
       .catch((err) => toast.error("Failed to delete user"));
   };

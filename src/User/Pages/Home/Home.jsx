@@ -193,7 +193,7 @@ export default function Home() {
             >
               <span className="bg-red-600 ms-2.5 top-7 absolute text-white p-.5 px-1.5 text-sm rounded-full">
                 {" "}
-                {cart.length}{" "}
+                {cart?.data?.length}{" "}
               </span>
               <img
                 className="h-6 w-auto "

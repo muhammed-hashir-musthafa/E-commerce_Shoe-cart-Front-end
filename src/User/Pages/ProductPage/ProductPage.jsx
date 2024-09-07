@@ -6,7 +6,7 @@ import { CartContext } from "../../Componet/Contexts/Contexts";
 import SearchBar from "../../../G-Components/SearchBar/SearchBar";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCartAsync } from "../../../../Redux/cartSlice/cartSlice";
-import toast  from "react-hot-toast";
+import toast from "react-hot-toast";
 import {
   settingWishList,
   removeFromWishListAsync,
@@ -64,8 +64,8 @@ const ProductPage = () => {
             </h2>
 
             <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-              {filteredProducts.map((product, index) => (
-                <div key={product.id} className="group relative">
+              {filteredProducts?.data?.map((product, index) => (
+                <div key={product._id} className="group relative">
                   <button
                     onClick={() => handleWishlist(product.id)}
                     className="absolute top-3 right-3 z-10 p-2"
@@ -73,7 +73,7 @@ const ProductPage = () => {
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill={
-                        wishlist.some((item) => item.id === product.id)
+                        wishlist?.data?.some((item) => item._id === product._id)
                           ? "red"
                           : "none"
                       }
@@ -81,7 +81,7 @@ const ProductPage = () => {
                       strokeWidth="2"
                       stroke="currentColor"
                       className={`w-6 h-6 ${
-                        wishlist.some((item) => item.id === product.id)
+                        wishlist?.data?.some((item) => item._id === product._id)
                           ? "text-red-500"
                           : "text-gray-400"
                       }`}
@@ -94,7 +94,7 @@ const ProductPage = () => {
                     </svg>
                   </button>
                   <Link
-                    to={`/products/:${product.id}`}
+                    to={`/products/:${product._id}`}
                     index={index}
                     product={product}
                   >
@@ -130,7 +130,7 @@ const ProductPage = () => {
             </div>
           </div>
         </div>
-        </div>
+      </div>
     </>
   );
 };

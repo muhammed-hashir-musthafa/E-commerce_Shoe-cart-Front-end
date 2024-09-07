@@ -26,9 +26,8 @@ export default function CartPage() {
   const id = localStorage.getItem("id");
   const { cart } = useSelector((state) => state.cartSlice);
 
-  const Subtotal = cart.reduce((total, product) => {
-    return total + parseFloat(product.price) * product.quantity;
-  }, 0);
+  let Subtotal 
+  
 
   // const newcart = settingCart;s
   // console.log(cart);
@@ -96,7 +95,7 @@ export default function CartPage() {
                               role="list"
                               className="-my-6 divide-y divide-gray-200"
                             >
-                              {cart.map((product) => (
+                              {cart?.data?.map((product) => (
                                 <li key={product.id} className="flex py-6">
                                   <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                     <img

@@ -1,14 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 // import axios from "axios";
 import api from "../../utils/axios";
- 
+
 export const settingCart = createAsyncThunk(
   "cartSlice/settingCart",
   async () => {
     try {
       const id = localStorage.getItem("id");
-      const res = await api.get(`/user/${id}`);
-      return res.data.cart;
+      if (!id) {
+        throw new Error("User ID not found");
+      }
+      const res = await api.get(`/admin/userlist`);
+      // console.log(res.data.data);
+      return res.data?.data?.cart;
     } catch (error) {
       console.log("something went wrong!");
       throw error;
@@ -22,7 +26,7 @@ export const addToCartAsync = createAsyncThunk(
     try {
       const state = getState();
       const id = localStorage.getItem("id");
-      let userCart = [...state.cartSlice.cart];
+      let userCart = [...state.cartSlice];
 
       const existingProductIndex = userCart.findIndex(
         (item) => item.id === product.id
@@ -31,7 +35,7 @@ export const addToCartAsync = createAsyncThunk(
       if (existingProductIndex !== -1) {
         const updatedCart = userCart.map((item, index) => {
           if (index === existingProductIndex) {
-            return { ...item, quantity: item.quantity + product.quantity }; 
+            return { ...item, quantity: item.quantity + product.quantity };
           }
           return item;
         });
@@ -40,7 +44,7 @@ export const addToCartAsync = createAsyncThunk(
         userCart.push({ ...product, quantity: product.quantity });
       }
 
-      await axios.patch(`http://localhost:8000/User/${id}`, { cart: userCart });
+      await api.post(`/user/${id}/cart`, { cart: userCart });
 
       return userCart;
     } catch (error) {
@@ -60,7 +64,7 @@ export const removeFromCartAsync = createAsyncThunk(
         (item) => item.id !== productId
       );
 
-      await axios.patch(`http://localhost:8000/User/${id}`, { cart: userCart });
+      await api.delete(`/user/${id}/cart`, { cart: userCart });
       return userCart;
     } catch (error) {
       console.log("something went wrong!");
@@ -82,7 +86,7 @@ export const quantityIncrementAsync = createAsyncThunk(
         return item;
       });
 
-      await axios.patch(`http://localhost:8000/User/${id}`, { cart: userCart });
+      await api.post(`user/${id}/cart`, { cart: userCart });
       return userCart;
     } catch (error) {
       console.log("something went wrong!");
@@ -104,7 +108,7 @@ export const quantityDecrementAsync = createAsyncThunk(
         return item;
       });
 
-      await axios.patch(`http://localhost:8000/User/${id}`, { cart: userCart });
+      await api.post(`/user/${id}/cart`, { cart: userCart });
       return userCart;
     } catch (error) {
       console.log("something went wrong!");

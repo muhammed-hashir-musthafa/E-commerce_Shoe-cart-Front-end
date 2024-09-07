@@ -39,7 +39,7 @@ export default function ProductDetail() {
   const { id } = useParams();
   const idNum = id.slice(1);
 
-  const product = products.find((item) => item.id === idNum);
+  const product = products?.data?.find((item) => item._id === idNum);
 
   // console.log(product);
 
@@ -47,7 +47,7 @@ export default function ProductDetail() {
   const [selectedColor, setSelectedColor] = useState(product1.colors[0]);
   const [selectedSize, setSelectedSize] = useState(product1.sizes[2]);
 
-  const [newQuantity, setNewQuantity] = useState(product.quantity);
+  const [newQuantity, setNewQuantity] = useState(product?.quantity);
 
   const handleChange = (change) => {
     const updatedQuantity = newQuantity + change;
@@ -56,7 +56,7 @@ export default function ProductDetail() {
       // updateQuantity(product.id, updatedQuantity);
     }
   };
-  // console.log(newQuantity);
+  console.log(newQuantity);
   const handleCart = () => {
     const productToAdd = { ...product, quantity: newQuantity };
     // addToCart(productToAdd);
@@ -107,15 +107,15 @@ export default function ProductDetail() {
                       <div className="aspect-h-3 aspect-w-2 overflow-hidden rounded-lg bg-gray-100 sm:col-span-4 lg:col-span-5">
                         <div className="group relative">
                           <img
-                            src={product.imageSrc}
-                            alt={product.imageAlt}
+                            src={product?.imageSrc}
+                            alt={product?.imageAlt}
                             className="object-cover object-center"
                           />
                         </div>
                       </div>
                       <div className="sm:col-span-8 lg:col-span-7">
                         <h2 className="text-2xl font-bold text-gray-900 sm:pr-12">
-                          {product.title}
+                          {product?.title}
                         </h2>
 
                         <section
@@ -127,7 +127,7 @@ export default function ProductDetail() {
                           </h3>
 
                           <p className="text-xl text-gray-900">
-                            ₹{product.price}
+                            ₹{product?.price}
                           </p>
                         </section>
 

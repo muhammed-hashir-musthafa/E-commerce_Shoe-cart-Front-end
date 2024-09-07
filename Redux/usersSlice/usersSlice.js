@@ -22,14 +22,14 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     searchFilterUser: (state, action) => {
-      state.filteredUsers = state.users.filter((user) =>
+      state.filteredUsers.data = state.users.data.filter((user) =>
         user.name.toLowerCase().includes(action.payload.toLowerCase())
       );
     },
     deleteUser: (state, action) => {
       const userId = action.payload.id;
-      state.users = state.users.filter((user) => user.id !== userId);
-      state.filteredUsers = state.filteredUsers.filter((user) => user.id !== userId);
+      state.users.data = state.users.data.filter((user) => user.id !== userId);
+      state.filteredUsers.data = state.filteredUsers.data.filter((user) => user.id !== userId);
     },
   },
   extraReducers: (builder) => {
