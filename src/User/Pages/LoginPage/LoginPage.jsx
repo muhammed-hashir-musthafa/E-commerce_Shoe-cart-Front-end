@@ -53,9 +53,9 @@ const LoginPage = () => {
               localStorage.setItem("id", res.data.data._id);
               localStorage.setItem("token", res.data.token);
               resetForm();
-              dispatch(login());
+              dispatch(login({ id: res.data.data._id }));
             }, 1500);
-            console.log(res.data.data.role==='admin')
+            // console.log(res.data.data.role==='admin')
             if (res.data.data.role === "admin") {
               navigate("/admin");
             } else {

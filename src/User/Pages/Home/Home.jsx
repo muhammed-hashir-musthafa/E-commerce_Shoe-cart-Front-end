@@ -40,22 +40,29 @@ export default function Home() {
   const { category } = useSelector((state) => state.productSlice);
   const { filteredUsers } = useSelector((state) => state.usersSlice);
   const { cart } = useSelector((state) => state.cartSlice);
+  const { wishlist } = useSelector((state) => state.wishlistSlice);
   const { isLogged } = useSelector((state) => state.isLogged);
   const dispatch = useDispatch();
   const userLogin = localStorage.getItem("id");
   const [userOrders, setUserOrders] = useState([]);
+  const [userWish, setUserWish] = useState([]);
   const [showOrders, setShowOrders] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showWishList, setShowWishList] = useState(false);
+
   useEffect(() => {
-    if (userLogin && filteredUsers.length > 0) {
-      const user = filteredUsers.find((user) => user.id === userLogin);
+    if (userLogin && filteredUsers?.data?.length > 0) {
+      const user = filteredUsers?.data?.find((user) => user._id === userLogin);
       // console.log(user);
       if (user) {
-        setUserOrders(user.orders);
+        setUserOrders(user.order);
+        setUserWish(user.wishlist);
       }
     }
   }, [userLogin, filteredUsers]);
 
+  // console.log(userWish);
+  // console.log(userOrders);
   const handleShowOrders = () => {
     setShowOrders(true);
   };
@@ -112,10 +119,10 @@ export default function Home() {
   // console.log(isLogged);
   return (
     <>
-      <header className="bg-white">
-        <div className="fixed bg-white z-10 w-full top-0">
+      <header className="bg-white ">
+        <div className="fixed bg-white w-full top-0 z-20">
           <nav
-            className="mx-auto flex max-w-7xl items-center justify-between p-6  lg:px-8"
+            className="mx-auto flex max-w-7xl items-center justify-between p-6  lg:px-8 "
             aria-label="Global"
           >
             <div className="flex lg:flex-1">
@@ -187,14 +194,36 @@ export default function Home() {
                 </option>
               </select>
             </PopoverGroup>
+            <div
+              className="relative text-sm font-semibold leading-6 w-6 sm:w-14 lg:ms-20 text-gray-900"
+              onClick={() => setShowWishList(true)}
+            >
+              {wishlist?.length > 0 && (
+                <span className="absolute  bg-red-600 text-white text-xs font-semibold rounded-full w-3 h-3 items-center justify-center md:ml-24 "></span>
+              )}
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                className="w-7 h-7 md:ml-20"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09A6.51 6.51 0 0116.5 3 5.5 5.5 0 0122 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                />
+              </svg>
+            </div>
+
             <Link
               to="/cart"
               className="text-sm font-semibold leading-6 w-6 sm:w-14 lg:ms-20 text-gray-900"
             >
-              <span className="bg-red-600 ms-2.5 top-7 absolute text-white p-.5 px-1.5 text-sm rounded-full">
-                {" "}
-                {cart?.data?.length}{" "}
-              </span>
+              {cart?.length > 0 && (
+                <span className="absolute  bg-red-600 text-white text-xs font-semibold rounded-full w-3 h-3 items-center justify-center ml-4 "></span>
+              )}
               <img
                 className="h-6 w-auto "
                 src="https://static-00.iconduck.com/assets.00/shopping-cart-icon-2048x2047-gv68pvgw.png"
@@ -362,7 +391,7 @@ export default function Home() {
               <span className="sr-only">Close</span>
               <XMarkIcon className="h-6 w-6 end-0" aria-hidden="true" />
             </button>
-            {userOrders.length > 0 ? (
+            {userOrders?.length > 0 ? (
               <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm text-center rounded-lg">
                 <thead className="ltr:text-left rtl:text-right">
                   <tr>
@@ -408,6 +437,50 @@ export default function Home() {
                         </tr>
                       ))}
                     </Fragment>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className="p-5 px-20 bg-white rounded-lg">No Orders Found</p>
+            )}
+          </div>
+        </div>
+      )}
+      {showWishList && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+          <div className="overflow-x-auto">
+            <button
+              type="button"
+              onClick={() => setShowWishList(false)}
+              className="text-white hover:text-gray-200 "
+            >
+              <span className="sr-only">Close</span>
+              <XMarkIcon className="h-6 w-6 end-0" aria-hidden="true" />
+            </button>
+            {userWish?.length > 0 ? (
+              <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm text-center rounded-lg">
+                <thead className="ltr:text-left rtl:text-right">
+                  <tr>
+                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                      Product Title
+                    </th>
+                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                      Product Color
+                    </th>
+                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                      Product Qunatity
+                    </th>
+                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                      Product Price
+                    </th>
+                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                      Total
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {userWish?.map((order, index) => (
+                    <Fragment key={index}>{console.log(order)}</Fragment>
                   ))}
                 </tbody>
               </table>

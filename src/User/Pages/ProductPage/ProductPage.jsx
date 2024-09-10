@@ -16,21 +16,21 @@ import {
 const ProductPage = () => {
   const dispatch = useDispatch();
   const { filteredProducts } = useSelector((state) => state.productSlice);
-  const { wishlist, status: wishlistStatus } = useSelector(
-    (state) => state.wishlistSlice
-  );
-
+  const { wishlist,wishlistStatus } = useSelector((state) => state.wishlistSlice);
+  // const {   status: wishlistStatus } = useSelector(
+  //   (state) => state.wishlistSlice
+  // );
+  // console.log(wishlist)
+ 
   // const { addToCart, filterItems } = useContext(CartContext);
 
   const handleCart = (product) => {
-    // dispatch(addCart(product));
-    dispatch(addToCartAsync(product));
+     dispatch(addToCartAsync(product));
 
     // addToCart(product);
     // console.log(cart);
     toast.success("Product added Successfully");
-    // toast.success(`product added successfully`);
-  };
+   };
 
   useEffect(() => {
     if (wishlistStatus === "idle") {
@@ -39,12 +39,13 @@ const ProductPage = () => {
   }, [dispatch, wishlistStatus]);
 
   const handleWishlist = (productId) => {
-    const isInWishlist = wishlist.some((item) => item.id === productId);
+    const isInWishlist = wishlist?.some((item) => item._id === productId);
+    // console.log(productId)
     if (isInWishlist) {
       dispatch(removeFromWishListAsync(productId));
       toast.success("Product removed from wishlist");
     } else {
-      const product = filteredProducts.find((item) => item.id === productId);
+      const product = filteredProducts?.data?.find((item) => item._id === productId);
       if (product) {
         dispatch(addToWishListAsync(product));
         toast.success("Product added to wishlist");
@@ -67,13 +68,13 @@ const ProductPage = () => {
               {filteredProducts?.data?.map((product, index) => (
                 <div key={product._id} className="group relative">
                   <button
-                    onClick={() => handleWishlist(product.id)}
+                    onClick={() => handleWishlist(product._id)}
                     className="absolute top-3 right-3 z-10 p-2"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill={
-                        wishlist?.data?.some((item) => item._id === product._id)
+                        wishlist?.some((item) => item._id === product._id)
                           ? "red"
                           : "none"
                       }
@@ -81,7 +82,7 @@ const ProductPage = () => {
                       strokeWidth="2"
                       stroke="currentColor"
                       className={`w-6 h-6 ${
-                        wishlist?.data?.some((item) => item._id === product._id)
+                        wishlist?.some((item) => item._id === product._id)
                           ? "text-red-500"
                           : "text-gray-400"
                       }`}

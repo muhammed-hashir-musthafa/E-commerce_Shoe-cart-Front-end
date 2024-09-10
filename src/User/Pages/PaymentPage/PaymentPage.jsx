@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { settingCart } from "../../../../Redux/cartSlice/cartSlice";
+import api from "../../../../utils/axios";
 const Payment = () => {
   const { cart } = useSelector((state) => state.cartSlice);
   const { filteredUsers } = useSelector((state) => state.usersSlice);
@@ -15,8 +16,7 @@ const Payment = () => {
   const [orders, setOrders] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userLogin = localStorage.getItem("id");
-  const user = filteredUsers.find((user) => user.id === userLogin);
+  const user = filteredUsers?.data?.find((user) => user._id === id);
 
   const Subtotal = cart.reduce((total, product) => {
     return total + parseFloat(product.price) * product.quantity;
@@ -43,10 +43,11 @@ const Payment = () => {
     { setSubmitting, resetForm, setErrors }
   ) => {
     try {
-      const preOrder = await axios.get(`http://localhost:8000/User/${id}`);
-      const prevOrder = preOrder.data.orders;
-      const address = preOrder.data.address;
-      const pincode = preOrder.data.pincode;
+      const preOrder = await api.get(`/user/${id}/orders`);
+      // console.log(preOrder.data.data.address)
+      const prevOrder = preOrder.data.data;
+      const address = preOrder.data.data.address;
+      const pincode = preOrder.data.data.pincode;
 
       const orderDetails = {
         Orders: cart,
@@ -59,26 +60,29 @@ const Payment = () => {
       const updatedOrder = [...prevOrder, orderDetails];
 
       if (address.length > 0 && pincode.length > 0) {
-        await axios
-          .patch(`http://localhost:8000/User/${id}`, { orders: updatedOrder })
-          .then((res) => {
-            setOrders(res.data.orders);
-          })
-          .catch((err) => {
-            console.error("Error updating orders:", err);
-            toast.error("Something went wrong while updating orders.");
-          });
+        api.post(`/user/${id}/payment-gateway`).then(res=>{
+          console.log(res.data)
+        }).catch(error=>console.error(error))
+        //   await axios
+        //     .patch(`http://localhost:8000/User/${id}`, { orders: updatedOrder })
+        //     .then((res) => {
+        //       setOrders(res.data.orders);
+        //     })
+        //     .catch((err) => {
+        //       console.error("Error updating orders:", err);
+        //       toast.error("Something went wrong while updating orders.");
+        //     });
 
         dispatch(settingCart([]));
-        await axios
-          .patch(`http://localhost:8000/User/${id}`, { cart: [] })
-          .then((res) => {
-            dispatch(settingCart(res.data.cart));
-          })
-          .catch((err) => {
-            console.error("Error clearing cart:", err);
-            toast.error("Something went wrong while clearing the cart.");
-          });
+        // await axios
+        //   .patch(`http://localhost:8000/User/${id}`, { cart: [] })
+        //   .then((res) => {
+        //     dispatch(settingCart(res.data.cart));
+        //   })
+        //   .catch((err) => {
+        //     console.error("Error clearing cart:", err);
+        //     toast.error("Something went wrong while clearing the cart.");
+        //   });
 
         resetForm();
         toast.success(`You Paid ₹${Subtotal} Successfully`);
@@ -96,6 +100,49 @@ const Payment = () => {
     }
   };
 
+  var options = {
+    key: "rzp_test_wL1B6IUAUSnQqu", // Enter the Key ID generated from the Dashboard
+    amount: Subtotal.toFixed(2),
+    currency: "INR",
+    name: "Kazpix", //your business name
+    description: "Test Transaction",
+    image: "../../../Assets/Logo.png",
+    order_id:"order_OuxQ5kiOz3P2PD" , //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    handler: function (response) {
+      console.log(response.razorpay_order_id);
+      console.log(response.razorpay_payment_id);
+      console.log(response.razorpay_signature);
+      // alert(response.razorpay_payment_id);
+      // alert(response.razorpay_order_id);
+      // alert(response.razorpay_signature)
+    },
+    prefill: {
+       name: user.username,  
+      email: user.email,
+      contact: user.contact,
+    },
+    notes: {
+      address: user.address,
+      pincode: user.pincode,
+    },
+    theme: {
+      color: "#3399cc",
+    },
+  };
+  var rzp1 = new window.Razorpay(options);
+  rzp1.on("payment.failed", function (response) {
+    alert(response.error.code);
+    alert(response.error.description);
+    alert(response.error.source);
+    alert(response.error.step);
+    alert(response.error.reason);
+    alert(response.error.metadata.order_id);
+    alert(response.error.metadata.payment_id);
+  });
+  document.getElementById("rzp-button1").onclick = function (e) {
+    rzp1.open();
+    e.preventDefault();
+  };
   return (
     <div className="max-w-lg mx-auto p-6 my-24 bg-white shadow-md rounded-lg">
       <h2 className="text-2xl font-semibold mb-6">Payment Details</h2>
@@ -107,7 +154,7 @@ const Payment = () => {
           <div className="flow-root">
             <ul className="-my-6 divide-y divide-gray-200">
               {cart.map((product) => (
-                <li key={product.id} className="flex py-6">
+                <li key={product._id} className="flex py-6">
                   <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                     <img
                       src={product.imageSrc}
@@ -174,7 +221,7 @@ const Payment = () => {
 
                     <div>
                       <p className="mt-1 text-pretty text-sm text-gray-700">
-                        Name: {user.name}
+                        Name: {user.username}
                       </p>
                       <p className="mt-1 text-pretty text-sm text-gray-700">
                         Address: {user.address}
@@ -256,6 +303,7 @@ const Payment = () => {
                 </div>
               </div>
               <button
+                id="rzp-button1"
                 disabled={isSubmitting}
                 onClick={() => {
                   setOrders(cart);
@@ -278,7 +326,7 @@ const Payment = () => {
           )}
         </Formik>
       </div>
-     </div>
+    </div>
   );
 };
 

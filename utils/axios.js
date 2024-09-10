@@ -4,7 +4,7 @@ import axios from "axios";
 // console.log(baseUrl);
 
 const baseUrl = "http://localhost:3001/api"
-console.log(baseUrl)
+// console.log(baseUrl)
 
 const api = axios.create({
   baseURL: baseUrl,

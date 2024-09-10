@@ -26,11 +26,11 @@ export default function CartPage() {
   const id = localStorage.getItem("id");
   const { cart } = useSelector((state) => state.cartSlice);
 
-  let Subtotal 
-  
+  const Subtotal = cart?.reduce((total, product) => {
+    return total + product.productId.price * product.quantity;
+  }, 0);
 
-  // const newcart = settingCart;s
-  // console.log(cart);
+  console.log(cart);
   const handleCheckout = () => {
     if (cart.length === 0) {
       toast.error("Your cart is empty");
@@ -41,7 +41,7 @@ export default function CartPage() {
   return (
     <>
       <Transition show={open}>
-        <Dialog className="relative z-10" onClose={() => setOpen(true)}>
+        <Dialog className="relative z-30" onClose={() => setOpen(true)}>
           <TransitionChild
             enter="ease-in-out duration-500"
             enterFrom="opacity-0"
@@ -95,12 +95,12 @@ export default function CartPage() {
                               role="list"
                               className="-my-6 divide-y divide-gray-200"
                             >
-                              {cart?.data?.map((product) => (
-                                <li key={product.id} className="flex py-6">
+                              {cart?.map((product) => (
+                                <li key={product._id} className="flex py-6">
                                   <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                     <img
-                                      src={product.imageSrc}
-                                      alt={product.imageAlt}
+                                      src={product.productId.imageSrc}
+                                      alt={product.productId.imageAlt}
                                       className="h-full w-full object-cover object-center"
                                     />
                                   </div>
@@ -109,41 +109,30 @@ export default function CartPage() {
                                     <div>
                                       <div className="flex justify-between text-base font-medium text-gray-900">
                                         <h3>
-                                          <a href={product.href}>
-                                            {product.title}
+                                          <a href={product.productId.href}>
+                                            {product.productId.title}
                                           </a>
                                         </h3>
                                         <span className="ml-4">
-                                          {product.price * product.quantity}
+                                          {product.productId.price *
+                                            product.quantity}
                                         </span>
                                       </div>
                                       <span className=" text-sm text-gray-500">
-                                        {product.color}
+                                        {product.productId.color}
                                       </span>
                                       <p className="mt-1 text-xs float-end text-gray-500">
-                                        {product.price} x {product.quantity}
+                                        {product.productId.price} x{" "}
+                                        {product.quantity}
                                       </p>
                                     </div>
                                     <div className="flex flex-1 items-end justify-between text-sm">
                                       <p className="text-gray-500">
                                         <button
                                           onClick={() => {
-                                            if (product.quantity <= 1) {
-                                              // removeFromCart(product.id);
-                                              dispatch(
-                                                removeFromCartAsync(product.id)
-                                              );
-                                            } else {
-                                              // updateQuantity(
-                                              //   product.id,
-                                              //   product.quantity - 1
-                                              // );
-                                              dispatch(
-                                                quantityDecrementAsync(
-                                                  product.id
-                                                )
-                                              );
-                                            }
+                                            dispatch(
+                                              quantityDecrementAsync(product)
+                                            );
                                           }}
                                           className="px-1 py-.5 bg-indigo-500 text-white font-semibold text-base rounded shadow hover:bg-indigo-600 focus:outline-none  focus:ring-indigo-600"
                                         >
@@ -157,7 +146,7 @@ export default function CartPage() {
                                             //   product.quantity + 1
                                             // );
                                             dispatch(
-                                              quantityIncrementAsync(product.id)
+                                              quantityIncrementAsync(product)
                                             );
                                           }}
                                           className="px-1 py-.5 bg-indigo-500 text-white font-semibold text-base rounded shadow hover:bg-indigo-600 focus:outline-none  focus:ring-indigo-600"
@@ -171,7 +160,7 @@ export default function CartPage() {
                                           onClick={() => {
                                             // removeFromCart(product.id)
                                             dispatch(
-                                              removeFromCartAsync(product.id)
+                                              removeFromCartAsync(product.productId._id)
                                             );
                                           }}
                                           type="button"

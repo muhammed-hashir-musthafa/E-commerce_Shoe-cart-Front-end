@@ -56,7 +56,7 @@ export default function ProductDetail() {
       // updateQuantity(product.id, updatedQuantity);
     }
   };
-  console.log(newQuantity);
+  // console.log(newQuantity);
   const handleCart = () => {
     const productToAdd = { ...product, quantity: newQuantity };
     // addToCart(productToAdd);

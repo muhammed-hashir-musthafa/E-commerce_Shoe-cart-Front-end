@@ -28,13 +28,27 @@ import { fetchProducts } from "../Redux/productSlice/productSlice";
 import { settingCart } from "../Redux/cartSlice/cartSlice";
 import { login } from "../Redux/logSlice/logSlice";
 import { Toaster } from "react-hot-toast";
+import { settingWishList } from "../Redux/wishlistSlice/wishlistSlice";
 
 function App() {
   const id = localStorage.getItem("id");
+  const { userId } = useSelector((state) => state.isLogged);
+  const { isLogged } = useSelector((state) => state.isLogged);
   // const { users, filteredUsers } = useSelector((state) => state.usersSlice);
   // const { products, filteredProducts } = useSelector(
   //   (state) => state.productSlice
   // );
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -43,16 +57,19 @@ function App() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (id) {
-      dispatch(settingCart());
-    }
-  }, [id]);
-
-  useEffect(() => {
-    if (localStorage.getItem("id")) {
-      dispatch(login());
+    const userId = localStorage.getItem("id");
+    if (userId) {
+      dispatch(login({ id: userId }));
     }
   }, []);
+
+  useEffect(() => {
+    if (userId && isLogged) {
+      dispatch(settingCart());
+      dispatch(settingWishList());
+    }
+  }, [userId, isLogged, dispatch]);
+
   // console.log(users);
   // console.log(products);
   // console.log(filteredProducts);
