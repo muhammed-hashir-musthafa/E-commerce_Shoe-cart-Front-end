@@ -46,21 +46,22 @@ const LoginPage = () => {
       await api
         .post("/user/login", values)
         .then((res) => {
+          // console.log(res)
           if (res.status >= 200 && res.status < 300) {
             setShowPopup(true);
+            localStorage.setItem("id", res.data.data._id);
+            localStorage.setItem("token", res.data.token);
+            resetForm();
+            dispatch(login({ id: res.data.data._id }));
+            console.log(res.data.data.role)
             setTimeout(() => {
               setShowPopup(false);
-              localStorage.setItem("id", res.data.data._id);
-              localStorage.setItem("token", res.data.token);
-              resetForm();
-              dispatch(login({ id: res.data.data._id }));
+              if (res.data.data.role == "admin") {
+                navigate("/admin");
+              } else {
+                navigate("/");
+              }
             }, 1500);
-            // console.log(res.data.data.role==='admin')
-            if (res.data.data.role === "admin") {
-              navigate("/admin");
-            } else {
-              navigate("/");
-            }
           }
         })
         .catch((error) => {

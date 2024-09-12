@@ -29,14 +29,7 @@ function classNames(...classes) {
 }
 
 export default function Home() {
-  const {
-    // logout,
-    // isLoggedIn,
-    // setCategory,
-    // categorize,
-    // category,
-    // filterUsers,
-  } = useContext(CartContext);
+  // const {// logout,// isLoggedIn,// setCategory,// categorize,// category,// filterUsers,} = useContext(CartContext);
   const { category } = useSelector((state) => state.productSlice);
   const { filteredUsers } = useSelector((state) => state.usersSlice);
   const { cart } = useSelector((state) => state.cartSlice);
@@ -49,14 +42,17 @@ export default function Home() {
   const [showOrders, setShowOrders] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showWishList, setShowWishList] = useState(false);
+  const user = filteredUsers?.data?.find((user) => user._id === userLogin);
 
   useEffect(() => {
+    api
+      .get(`/user/${userLogin}/orders`)
+      .then((res) => setUserOrders(res.data.data.products))
+      .catch((error) => console.error(error.message));
     if (userLogin && filteredUsers?.data?.length > 0) {
-      const user = filteredUsers?.data?.find((user) => user._id === userLogin);
       // console.log(user);
       if (user) {
-        setUserOrders(user.order);
-        setUserWish(user.wishlist);
+        setUserWish(wishlist);
       }
     }
   }, [userLogin, filteredUsers]);
@@ -116,7 +112,7 @@ export default function Home() {
     }
   };
 
-  // console.log(isLogged);
+  // console.log(user);
   return (
     <>
       <header className="bg-white ">
@@ -146,12 +142,22 @@ export default function Home() {
               </button>
             </div>
             <PopoverGroup className="hidden lg:flex lg:gap-x-12">
+              {user?.role == "admin" && (
+                <Link
+                  to="/admin"
+                  className="text-sm font-semibold leading-6 text-gray-900"
+                >
+                  Go to admin
+                </Link>
+              )}
+
               <Link
                 to="/"
                 className="text-sm font-semibold leading-6 text-gray-900"
               >
                 Home
               </Link>
+
               <Link
                 to="/products"
                 className="text-sm font-semibold leading-6 text-gray-900"
@@ -195,7 +201,7 @@ export default function Home() {
               </select>
             </PopoverGroup>
             <div
-              className="relative text-sm font-semibold leading-6 w-6 sm:w-14 lg:ms-20 text-gray-900"
+              className="relative text-sm font-semibold leading-6 w-6 sm:w-14 lg:ms-20 text-gray-900 cursor-pointer"
               onClick={() => setShowWishList(true)}
             >
               {wishlist?.length > 0 && (
@@ -275,7 +281,7 @@ export default function Home() {
                       <Link
                         to={"/login"}
                         onClick={() => {
-                          dispatch(logout());
+                          logout;
                           localStorage.clear();
                         }}
                         className={classNames(
@@ -365,7 +371,7 @@ export default function Home() {
                   {!isLogged && (
                     <Link
                       onClick={() => {
-                        dispatch(logout());
+                        logout;
                         localStorage.clear();
                       }}
                       to={"/login"}
@@ -413,30 +419,27 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {userOrders.map((order, index) => (
-                    <Fragment key={index}>
-                      {order.Orders.map((neworder, index) => (
-                        <tr key={index} className="odd:bg-gray-50">
-                          {/* {console.log(userOrders)} */}
-                          {/* {console.log(order.Orders)} */}
-                          <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                            {neworder.title}
-                          </td>
-                          <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                            {neworder.color}
-                          </td>
-                          <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                            {neworder.quantity}
-                          </td>
-                          <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                            {neworder.price}
-                          </td>
-                          <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                            {neworder.price * neworder.quantity}
-                          </td>
-                        </tr>
-                      ))}
-                    </Fragment>
+                  {/* {console.log(userOrders)} */}
+                  {userOrders.map((order) => (
+                    <tr key={order._id} className="odd:bg-gray-50">
+                      {/* {console.log(userOrders)} */}
+                      {/* {console.log(order.Orders)} */}
+                      <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                        {order.productId.title}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                        {order.productId.color}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                        {order.quantity}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                        {order.productId.price}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                        {order.productId.price * order.quantity}
+                      </td>
+                    </tr>
                   ))}
                 </tbody>
               </table>
@@ -457,6 +460,7 @@ export default function Home() {
               <span className="sr-only">Close</span>
               <XMarkIcon className="h-6 w-6 end-0" aria-hidden="true" />
             </button>
+            {/* {console.log(userWish)} */}
             {userWish?.length > 0 ? (
               <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm text-center rounded-lg">
                 <thead className="ltr:text-left rtl:text-right">
@@ -473,19 +477,32 @@ export default function Home() {
                     <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
                       Product Price
                     </th>
-                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                      Total
-                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {userWish?.map((order, index) => (
-                    <Fragment key={index}>{console.log(order)}</Fragment>
+                  {userWish?.map((wish) => (
+                    <tr key={wish._id} className="odd:bg-gray-50">
+                      {/* {console.log(wish)} */}
+                      <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                        {wish.productId.title}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                        {wish.productId.color}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                        {wish.productId.quantity}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                        {wish.productId.price}
+                      </td>
+                    </tr>
                   ))}
                 </tbody>
               </table>
             ) : (
-              <p className="p-5 px-20 bg-white rounded-lg">No Orders Found</p>
+              <p className="p-5 px-20 bg-white rounded-lg">
+                No Wish list Found
+              </p>
             )}
           </div>
         </div>

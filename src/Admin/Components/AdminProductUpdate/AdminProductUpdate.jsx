@@ -15,9 +15,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import api from "../../../../utils/axios";
+import { fetchProducts, updateProduct } from "../../../../Redux/productSlice/productSlice";
+
 // import { CartContext } from "../../../User/Componet/Contexts/Contexts";
 
 export default function AdminProductUpdate() {
+  const dispatch = useDispatch();
   const { products } = useSelector((state) => state.productSlice);
   // const { products } = useContext(CartContext);
   const { id } = useParams();
@@ -41,8 +44,13 @@ export default function AdminProductUpdate() {
         (key) => values[key] !== product[key]
       );
 
+      // console.log(product)
+
       if (updated) {
         await api.patch(`/admin/${product._id}/product`, values);
+        dispatch(updateProduct(values));
+        dispatch(fetchProducts());
+
         toast.success(`Updated product successfully`);
       } else {
         toast("No changes applied", { icon: "ℹ️" });
@@ -56,7 +64,7 @@ export default function AdminProductUpdate() {
     }
   };
 
-  console.log(products);
+  // console.log(products);
   return (
     <>
       <Transition show={open}>

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import wishlist from "../../../Assets/wishlist icon.png";
 // import { toast } from "react-toastify";
-import { CartContext } from "../../Componet/Contexts/Contexts";
+// import { CartContext } from "../../Componet/Contexts/Contexts";
 import SearchBar from "../../../G-Components/SearchBar/SearchBar";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCartAsync } from "../../../../Redux/cartSlice/cartSlice";
@@ -15,22 +15,9 @@ import {
 
 const ProductPage = () => {
   const dispatch = useDispatch();
+  const wishlistStatus = useSelector((state) => state.wishlistSlice.status);
+  const { wishlist } = useSelector((state) => state.wishlistSlice);
   const { filteredProducts } = useSelector((state) => state.productSlice);
-  const { wishlist,wishlistStatus } = useSelector((state) => state.wishlistSlice);
-  // const {   status: wishlistStatus } = useSelector(
-  //   (state) => state.wishlistSlice
-  // );
-  // console.log(wishlist)
- 
-  // const { addToCart, filterItems } = useContext(CartContext);
-
-  const handleCart = (product) => {
-     dispatch(addToCartAsync(product));
-
-    // addToCart(product);
-    // console.log(cart);
-    toast.success("Product added Successfully");
-   };
 
   useEffect(() => {
     if (wishlistStatus === "idle") {
@@ -39,13 +26,15 @@ const ProductPage = () => {
   }, [dispatch, wishlistStatus]);
 
   const handleWishlist = (productId) => {
-    const isInWishlist = wishlist?.some((item) => item._id === productId);
-    // console.log(productId)
+    const isInWishlist = wishlist.some((item) => item._id === productId);
+
     if (isInWishlist) {
       dispatch(removeFromWishListAsync(productId));
       toast.success("Product removed from wishlist");
     } else {
-      const product = filteredProducts?.data?.find((item) => item._id === productId);
+      const product = filteredProducts?.data?.find(
+        (item) => item._id === productId
+      );
       if (product) {
         dispatch(addToWishListAsync(product));
         toast.success("Product added to wishlist");
@@ -71,10 +60,13 @@ const ProductPage = () => {
                     onClick={() => handleWishlist(product._id)}
                     className="absolute top-3 right-3 z-10 p-2"
                   >
+                    {/* {console.log(wishlist)} */}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill={
-                        wishlist?.some((item) => item._id === product._id)
+                        wishlist?.some(
+                          (item) => item?.productId?._id === product?._id
+                        )
                           ? "red"
                           : "none"
                       }
@@ -82,7 +74,9 @@ const ProductPage = () => {
                       strokeWidth="2"
                       stroke="currentColor"
                       className={`w-6 h-6 ${
-                        wishlist?.some((item) => item._id === product._id)
+                        wishlist?.some(
+                          (item) => item?.productId?._id === product?._id
+                        )
                           ? "text-red-500"
                           : "text-gray-400"
                       }`}
@@ -118,13 +112,13 @@ const ProductPage = () => {
                     <p className="text-md font-medium text-gray-900">
                       ₹{product.price}
                     </p>
-                    <button
+                    {/* <button
                       onClick={() => handleCart(product)}
                       type="button"
                       className="rounded-md bg-indigo-600 px-2 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
                       Add to cart
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               ))}

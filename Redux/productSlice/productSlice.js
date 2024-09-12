@@ -6,7 +6,7 @@ export const fetchProducts = createAsyncThunk(
   "productSlice/fetchProducts",
   async () => {
     try {
-      const res = await api.get("user/products");
+      const res = await api.get("admin/products");
       // console.log(res.data.data);
       return res.data;
     } catch (error) {
@@ -40,20 +40,36 @@ const productSlice = createSlice({
       }
       // console.log(action.payload);
     },
+    addProduct: (state, action) => {
+      state.products.data.push(action.payload);
+      state.filteredProducts.data.push(action.payload);
+    },
     deleteProduct: (state, action) => {
-      const productId = action.payload.id;
-      state.products.data = state.products.data.filter(
-        (product) => product.id !== productId
+      const productId = action.payload._id;
+      const products = state.products.data.filter(
+        (product) => product._id !== productId
       );
-      state.filteredProducts.data = state.filteredProducts.data.filter(
-        (product) => product.id !== productId
+      state.products.data = products;
+
+      const filteredProducts = state.filteredProducts.data.filter(
+        (product) => product._id !== productId
+      );
+      state.filteredProducts.data = filteredProducts;
+    },
+    updateProduct: (state, action) => {
+      const updatedProduct = action.payload;
+      state.products.data = state.products.data.map((product) =>
+        product._id === updatedProduct._id ? updatedProduct : product
+      );
+      state.filteredProducts.data = state.filteredProducts.data.map((product) =>
+        product._id === updatedProduct._id ? updatedProduct : product
       );
     },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchProducts.pending, (state, action) => {
       console.log("loading");
-    }),
+    }), 
       builder.addCase(fetchProducts.rejected, (state, action) => {
         console.log("Error in fetching");
       }),
@@ -67,4 +83,10 @@ const productSlice = createSlice({
 });
 
 export default productSlice.reducer;
-export const { categorize, searchFilter, deleteProduct } = productSlice.actions;
+export const {
+  categorize,
+  searchFilter,
+  deleteProduct,
+  addProduct,
+  updateProduct,
+} = productSlice.actions;

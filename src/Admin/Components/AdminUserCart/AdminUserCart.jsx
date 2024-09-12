@@ -11,40 +11,20 @@ import { useParams } from "react-router-dom";
 // import axios from "axios";
 // import { toast } from "react-toastify";
 import toast from "react-hot-toast";
-import api from "../../../../utils/axios";
+// import api from "../../../../utils/axios ";
+import { useSelector } from "react-redux";
 
 export default function AdminUserCart() {
   const [users, setUsers] = useState([]);
   const { id } = useParams();
   const idNum = id.slice(1);
-  const user = users.find((item) => item.id === idNum);
+  const user = users.find((item) => item._id === idNum);
   const [open, setOpen] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const [cart, setCart] = useState([]);
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await api.get("/admin/userlist");
-        // console.log(res.data.data)
-        setUsers(res.data.data);
-        setLoading(false);
-      } catch (err) {
-        toast.error("Something went wrong", err);
-        setLoading(false);
-      }
-    };
-    fetchUsers();
-  }, []);
-
-  // useEffect(() => {
-  //   if (!loading) {
-  //     setCart(user.cart);
-  //   }
-  // }, [user, loading]);
-
-  const Subtotal = cart.reduce((total, product) => {
-    return total + parseFloat(product.price) * product.quantity;
+ 
+  const { cart } = useSelector((state) => state.cartSlice);
+  
+  const Subtotal = cart?.reduce((total, product) => {
+    return total + product.productId.price * product.quantity;
   }, 0);
 
   return (
@@ -110,22 +90,22 @@ export default function AdminUserCart() {
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-200">
-                            {cart.map((user) => (
-                              <tr key={user.id} className="odd:bg-gray-50">
+                            {cart.map((product) => (
+                              <tr key={product._id} className="odd:bg-gray-50">
                                 <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                  {user.title}
+                                  {product.productId.title}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                  {user.color}
+                                  {product.productId.color}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                  {user.quantity}
+                                  {product.quantity}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                  {user.price}
+                                  {product.productId.price}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                  {user.price * user.quantity}
+                                  {product.productId.price * product.quantity}
                                 </td>
                               </tr>
                             ))}

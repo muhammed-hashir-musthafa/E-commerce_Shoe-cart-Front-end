@@ -5,8 +5,11 @@ import React from "react";
 import toast from "react-hot-toast";
 import * as yup from "yup";
 import api from "../../../../utils/axios";
+import { useDispatch } from "react-redux";
+import { addProduct } from "../../../../Redux/productSlice/productSlice";
 
 const AdminAddProduct = () => {
+  const dispatch = useDispatch();
   const validationSchema = yup.object({
     title: yup.string().required("This Field is Required"),
     imageSrc: yup.string().url().required("This Field is Required"),
@@ -21,10 +24,11 @@ const AdminAddProduct = () => {
     { setSubmitting, setErrors, resetForm }
   ) => {
     try {
-      await api.post("/admin/product", values);
+      const response = await api.post("/admin/product", values);
+      dispatch(addProduct(response.data.data));
       toast.success(`Added "${values.title}" succesfully`);
       resetForm();
-      console.log(values);
+      // console.log(values);
     } catch (error) {
       resetForm();
       setErrors({ submit: error.message });

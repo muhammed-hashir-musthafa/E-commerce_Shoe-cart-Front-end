@@ -8,36 +8,103 @@ import {
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Link, useNavigate } from "react-router-dom";
-// import { toast } from "react-toastify";
 import toast from "react-hot-toast";
-// import { CartContext } from "../../Componet/Contexts/Contexts";
 import { useDispatch, useSelector } from "react-redux";
 import {
   quantityDecrementAsync,
   quantityIncrementAsync,
   removeFromCartAsync,
+  settingCart,
 } from "../../../../Redux/cartSlice/cartSlice";
+// import axios from "axios";
+import logo from "../../../Assets/Logo.png";
+import api from "../../../../utils/axios";
 
 export default function CartPage() {
   const dispatch = useDispatch();
-  // const { updateQuantity, removeFromCart } = useContext(CartContext);
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();
   const id = localStorage.getItem("id");
   const { cart } = useSelector((state) => state.cartSlice);
+  const { filteredUsers } = useSelector((state) => state.usersSlice);
+  const user = filteredUsers?.data?.find((user) => user._id === id);
 
   const Subtotal = cart?.reduce((total, product) => {
     return total + product.productId.price * product.quantity;
   }, 0);
 
-  console.log(cart);
-  const handleCheckout = () => {
-    if (cart.length === 0) {
-      toast.error("Your cart is empty");
-    } else {
-      navigate("/paymentsection");
+  const handleCheckout = async () => {
+    try {
+      const response = await api.post(`/user/${id}/payment-gateway`, {
+        currency: "INR",
+        amount: Subtotal * 100,
+      });
+
+      if (response.data.success) {
+        // const { data: order } = response;
+        // console.log(order._id)
+        const options = {
+          key: "rzp_test_wL1B6IUAUSnQqu",
+          amount: Subtotal * 100,
+          currency: "INR",
+          name: "Kazpix",
+          description: "Test Transaction",
+          image: { logo },
+          order_id: response.data.data.id,
+          handler: async function (response) {
+            console.log(response);
+            console.log(response.razorpay_order_id);
+            console.log(response.razorpay_signature);
+            console.log(response.razorpay_payment_id);
+            const verificationResponse = await api.post(
+              `/user/${id}/payment-verification`,
+              {
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+              }
+            );
+            console.log(verificationResponse);
+            if (verificationResponse?.data?.success) {
+              dispatch(settingCart([]));
+              toast.success(`You Paid ₹${Subtotal} Successfully`);
+              navigate("/products");
+            } else {
+              toast.error("Payment verification failed");
+            }
+          },
+          prefill: {
+            name: user.username,
+            email: user.email,
+            contact: user.contact,
+          },
+          notes: {
+            address: user.address,
+            pincode: user.pincode,
+          },
+          theme: {
+            color: "#3399cc",
+          },
+        };
+
+        const rzp1 = new window.Razorpay(options);
+        rzp1.on("payment.failed", function (response) {
+          alert(`Payment failed: ${response.error.description}`);
+        });
+        rzp1.open();
+      } else {
+        toast.error("Failed to create payment order");
+      }
+    } catch (error) {
+      if (error.response.status == 404) {
+        toast.error("Cart is empty ");
+      } else {
+        console.error("Payment Creation Failed:", error);
+        toast.error("Payment Creation Failed. Please try again.");
+      }
     }
   };
+
   return (
     <>
       <Transition show={open}>
@@ -141,10 +208,6 @@ export default function CartPage() {
                                         Qty {product.quantity}{" "}
                                         <button
                                           onClick={() => {
-                                            // updateQuantity(
-                                            //   product.id,
-                                            //   product.quantity + 1
-                                            // );
                                             dispatch(
                                               quantityIncrementAsync(product)
                                             );
@@ -158,9 +221,10 @@ export default function CartPage() {
                                       <div className="flex">
                                         <button
                                           onClick={() => {
-                                            // removeFromCart(product.id)
                                             dispatch(
-                                              removeFromCartAsync(product.productId._id)
+                                              removeFromCartAsync(
+                                                product.productId._id
+                                              )
                                             );
                                           }}
                                           type="button"
@@ -188,6 +252,7 @@ export default function CartPage() {
                         </p>
                         <div className="mt-6">
                           <button
+                            id="rzp-button1"
                             onClick={handleCheckout}
                             className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
                           >

@@ -6,7 +6,7 @@ import LoginPage from "./User/Pages/LoginPage/LoginPage";
 import NotFoundPage from "./User/Pages/NotFoundPage/NotFoundPage";
 import ProductPage from "./User/Pages/ProductPage/ProductPage";
 import RegistrationPage from "./User/Pages/RegistrationPage/RegistrationPage";
-import PaymentSection from "./User/Pages/PaymentPage/PaymentPage";
+// import PaymentSection from "./User/Pages/PaymentPage/PaymentPage";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import ContactPage from "./User/Pages/ContactPage/ContactPage";
 import ProtectedRoute from "./User/Componet/protectedRoute/protectedRoute";
@@ -44,10 +44,7 @@ function App() {
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
     document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
+    return () => document.body.removeChild(script);
   }, []);
 
   const dispatch = useDispatch();
@@ -95,10 +92,10 @@ function App() {
               path="products/:id"
               element={<ProtectedRoute element={<ProductDetails />} />}
             />
-            <Route
+            {/* <Route
               path="paymentsection"
               element={<ProtectedRoute element={<PaymentSection />} />}
-            />
+            /> */}
             <Route path="*" element={<NotFoundPage />} />
           </Route>
           <Route

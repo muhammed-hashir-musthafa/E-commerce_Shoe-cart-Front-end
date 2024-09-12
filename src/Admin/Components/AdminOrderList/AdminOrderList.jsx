@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   Dialog,
   DialogPanel,
@@ -16,23 +16,22 @@ import api from "../../../../utils/axios";
 export default function AdminOrderList() {
   const { id } = useParams();
   const idNum = id.slice(1);
-  const userId =localStorage.getItem('id')
+  const userId = localStorage.getItem("id");
   const [open, setOpen] = useState(true);
-  const [orders, setOrders] = useState([]);
+  const [userOrders, setUserOrders] = useState([]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await api.get(`admin/orders`);
+    api
+      .get(`/user/${idNum}/orders`)
+      .then((res) => {
+        // console.log(res.data.data.products)
         // console.log(res.data.data);
-        setOrders(res.data.data);
-      } catch (err) {
-        toast.error("Something went wrong", err);
-      }
-    };
-    fetchUsers();
+        setUserOrders([res.data.data]);
+      })
+      .catch((error) => console.error(error.message));
   }, [idNum]);
 
+  // console.log(userOrders);
   return (
     <>
       <Transition show={open}>
@@ -74,64 +73,53 @@ export default function AdminOrderList() {
                       </Link>
                     </button>
                     <div className="overflow-x-auto">
-                      {orders.length > 0 ? (
+                      {userOrders.length > 0 ? (
                         <div className="p-2 text-start">
                           <h1 className="text-xl font-semibold mb-4">
                             Order Details
                           </h1>
-                          {orders.map((order, index) => {
-                            // const Subtotal = order.Orders.reduce(
-                            //   (total, product) => {
-                            //     return (
-                            //       total +
-                            //       parseFloat(product.price) * product.quantity
-                            //     );
-                            //   },
-                            //   0
-                            // );
-
-                            return (
-                              <div
-                                key={index}
-                                className="mb-8 p-2 bg-white shadow-lg rounded-lg border-l-4 border-indigo-600"
-                              >
-                                <div className="mb-1">
-                                  <p>Customer Name: {order.Customer_Name}</p>
-                                  <p>Billing Address: {order.address}</p>
-                                  <p>Billing Pincode: {order.pincode}</p>
-                                </div>
-                                <h2 className="text-base mb-2 text-rose-600">
-                                  Items
-                                </h2>
-                                <ul className="space-y-4">
-                                  {order.map((item) => (
-                                    <li
-                                      key={item._id}
-                                      className="items-center space-x-4 p-2 border rounded-lg"
-                                    >
-                                      <div>
+                          {userOrders.map((order) => (
+                            <div
+                              key={order._id}
+                              className="mb-8 p-2 bg-white shadow-lg rounded-lg border-l-4 border-indigo-600"
+                            >
+                              {/* {console.log(order)} */}
+                              <div className="mb-1">
+                                <p>Customer Name: {order.Customer_Name}</p>
+                                <p>Billing Address: {order.address}</p>
+                                <p>Billing Pincode: {order.pincode}</p>
+                              </div>
+                              <h2 className="text-base mb-2 text-rose-600">
+                                Items
+                              </h2>
+                              <ul className="space-y-4">
+                                <li className="items-center space-x-4 p-2 border rounded-lg">
+                                  <div>
+                                    {order.products.map((product) => (
+                                      <Fragment key={product._id}>
                                         <p className="font-bold text-lg text-indigo-900">
-                                          {item.title}
+                                          {product.productId.title}
                                         </p>
                                         <p className="text-sm text-gray-600">
-                                          {item.category}
+                                          {product.productId.category}
                                         </p>
                                         <p className="font-semibold">
-                                          Price: {item.price}
+                                          Price:{" "}
+                                          {product.productId.price}
                                         </p>
                                         <p className="font-semibold">
-                                          Quantity: {item.quantity}
+                                          Quantity: {product.quantity}
                                         </p>
-                                      </div>
-                                    </li>
-                                  ))}
-                                </ul>
-                                <p className="font-semibold my-5 ms-5">
-                                  Paid Amount: {order.Total_Amount}
-                                </p>
-                              </div>
-                            );
-                          })}
+                                      </Fragment>
+                                    ))}
+                                  </div>
+                                </li>
+                              </ul>
+                              <p className="font-semibold my-5 ms-5">
+                                Paid Amount: {order.Total_Amount}
+                              </p>
+                            </div>
+                          ))}
                         </div>
                       ) : (
                         <p className="text-center font-bold">

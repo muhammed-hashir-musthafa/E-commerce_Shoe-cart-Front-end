@@ -71,17 +71,23 @@ export const removeFromCartAsync = createAsyncThunk(
   "cartSlice/removeFromCartAsync",
   async (productId, { getState }) => {
     try {
-      // const state = getState();
       const id = localStorage.getItem("id");
-      // const userCart = Array.isArray(state.cartSlice.cart)
-      //   ? state.cartSlice.cart.filter((item) => item._id !== productId)
-      //   : [];
 
-      await api.delete(`/user/${id}/cart`, {
+      const deleteProduct = await api.delete(`/user/${id}/cart`, {
         data: { productId: productId },
       });
-      const res = await api.get(`/user/${id}/cart`);
-       return res.data.data.products;
+      const currentProducts = deleteProduct?.data?.data?.products;
+
+      if (currentProducts.length > 0) {
+        const res = await api.get(`/user/${id}/cart`);
+        if (res?.data?.data?.products) {
+          return res.data.data.products;
+        } else {
+          throw new Error("Cart not found or empty");
+        }
+      } else {
+        return [];
+      }
     } catch (error) {
       console.log("something went wrong!");
       throw error;
@@ -110,7 +116,7 @@ export const quantityIncrementAsync = createAsyncThunk(
         action: "increment",
       });
       const res = await api.get(`/user/${id}/cart`);
-       return res.data.data.products;
+      return res.data.data.products;
     } catch (error) {
       console.log("something went wrong!");
       throw error;
