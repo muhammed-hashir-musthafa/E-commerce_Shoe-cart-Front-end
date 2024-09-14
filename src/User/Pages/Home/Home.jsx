@@ -19,7 +19,7 @@ import * as yup from "yup";
 // import axios from "axios";
 import api from "../../../../utils/axios";
 import { toast } from "react-toastify";
-import { CartContext } from "../../Componet/Contexts/Contexts";
+// import { CartContext } from "../../Componet/Contexts/Contexts";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../../../Redux/logSlice/logSlice";
 import { categorize } from "../../../../Redux/productSlice/productSlice";
@@ -30,7 +30,7 @@ function classNames(...classes) {
 
 export default function Home() {
   // const {// logout,// isLoggedIn,// setCategory,// categorize,// category,// filterUsers,} = useContext(CartContext);
-  const { category } = useSelector((state) => state.productSlice);
+  // const { category } = useSelector((state) => state.productSlice);
   const { filteredUsers } = useSelector((state) => state.usersSlice);
   const { cart } = useSelector((state) => state.cartSlice);
   const { wishlist } = useSelector((state) => state.wishlistSlice);
@@ -47,7 +47,7 @@ export default function Home() {
   useEffect(() => {
     api
       .get(`/user/${userLogin}/orders`)
-      .then((res) => setUserOrders(res.data.data.products))
+      .then((res) => setUserOrders([res.data.data]))
       .catch((error) => console.error(error.message));
     if (userLogin && filteredUsers?.data?.length > 0) {
       // console.log(user);
@@ -387,126 +387,166 @@ export default function Home() {
         </Dialog>
       </header>
       {showOrders && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="overflow-x-auto">
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-70 z-50 backdrop-blur-lg">
+          <div className="relative bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto ">
             <button
               type="button"
               onClick={() => setShowOrders(false)}
-              className="text-white hover:text-gray-200 "
+              className="absolute top-4 right-4 text-gray-700 hover:text-gray-900"
             >
               <span className="sr-only">Close</span>
-              <XMarkIcon className="h-6 w-6 end-0" aria-hidden="true" />
+              <XMarkIcon className="h-6 w-6" aria-hidden="true" />
             </button>
-            {userOrders?.length > 0 ? (
-              <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm text-center rounded-lg">
-                <thead className="ltr:text-left rtl:text-right">
-                  <tr>
-                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                      Product Title
-                    </th>
-                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                      Product Color
-                    </th>
-                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                      Product Qunatity
-                    </th>
-                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                      Product Price
-                    </th>
-                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                      Total
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {/* {console.log(userOrders)} */}
-                  {userOrders.map((order) => (
-                    <tr key={order._id} className="odd:bg-gray-50">
-                      {/* {console.log(userOrders)} */}
-                      {/* {console.log(order.Orders)} */}
-                      <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                        {order.productId.title}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        {order.productId.color}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        {order.quantity}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        {order.productId.price}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        {order.productId.price * order.quantity}
-                      </td>
+
+            <div className="p-6">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                Order Details
+              </h2>
+
+              {userOrders?.length > 0 ? (
+                <table className="min-w-full divide-y divide-gray-200 bg-white text-sm rounded-lg">
+                  <thead className="bg-gray-100 text-gray-600">
+                    <tr>
+                      <th className="whitespace-nowrap px-4 py-3 font-medium text-left">
+                        Image
+                      </th>
+                      <th className="whitespace-nowrap px-4 py-3 font-medium text-left">
+                        Product Title
+                      </th>
+                      <th className="whitespace-nowrap px-4 py-3 font-medium text-left">
+                        Product Color
+                      </th>
+                      <th className="whitespace-nowrap px-4 py-3 font-medium text-left">
+                        Quantity
+                      </th>
+                      <th className="whitespace-nowrap px-4 py-3 font-medium text-left">
+                        Price
+                      </th>
+                      <th className="whitespace-nowrap px-4 py-3 font-medium text-left">
+                        Total
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className="p-5 px-20 bg-white rounded-lg">No Orders Found</p>
-            )}
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {userOrders.map((orders, index) => (
+                      <Fragment key={index}>
+                        {orders.map((order) => (
+                          <Fragment key={order._id}>
+                            {order.products.map((product) => (
+                              <tr key={product._id} className="odd:bg-gray-50">
+                                <td className="whitespace-nowrap px-4 py-4 text-gray-900">
+                                  <img
+                                    src={product.productId.imageSrc}
+                                    alt={product.productId.title}
+                                    className="w-16 h-16 object-cover rounded-md"
+                                  />
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-4 text-gray-900 font-medium">
+                                  {product.productId.title}
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-4 text-gray-700">
+                                  {product.productId.color}
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-4 text-gray-700">
+                                  {product.quantity}
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-4 text-gray-700">
+                                  ₹{product.productId.price}
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-4 text-gray-700">
+                                  ₹{product.productId.price * product.quantity}
+                                </td>
+                              </tr>
+                            ))}
+                          </Fragment>
+                        ))}
+                      </Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="p-5 text-center text-gray-700">No Orders Found</p>
+              )}
+            </div>
           </div>
         </div>
       )}
       {showWishList && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="overflow-x-auto">
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-70 z-50 backdrop-blur-lg">
+          <div className="relative bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6">
             <button
               type="button"
               onClick={() => setShowWishList(false)}
-              className="text-white hover:text-gray-200 "
+              className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full focus:outline-none"
             >
               <span className="sr-only">Close</span>
-              <XMarkIcon className="h-6 w-6 end-0" aria-hidden="true" />
+              <XMarkIcon className="h-5 w-5" aria-hidden="true" />
             </button>
-            {/* {console.log(userWish)} */}
+
+            <h2 className="text-2xl font-semibold text-gray-800 text-center mb-4">
+              Your Wishlist
+            </h2>
             {userWish?.length > 0 ? (
-              <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm text-center rounded-lg">
-                <thead className="ltr:text-left rtl:text-right">
-                  <tr>
-                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                      Product Title
-                    </th>
-                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                      Product Color
-                    </th>
-                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                      Product Qunatity
-                    </th>
-                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                      Product Price
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {userWish?.map((wish) => (
-                    <tr key={wish._id} className="odd:bg-gray-50">
-                      {/* {console.log(wish)} */}
-                      <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                        {wish.productId.title}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        {wish.productId.color}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        {wish.productId.quantity}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        {wish.productId.price}
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200 text-sm text-left bg-gray-50 shadow-lg rounded-lg">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-4 py-3 text-gray-700 font-semibold">
+                        Product Image
+                      </th>
+                      <th className="px-6 py-3 text-gray-700 font-semibold">
+                        Product Title
+                      </th>
+                      <th className="px-6 py-3 text-gray-700 font-semibold">
+                        Product Color
+                      </th>
+                      <th className="px-6 py-3 text-gray-700 font-semibold">
+                        Product Quantity
+                      </th>
+                      <th className="px-6 py-3 text-gray-700 font-semibold">
+                        Product Price
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {userWish?.map((wish) => (
+                      <tr
+                        key={wish._id}
+                        className="odd:bg-white even:bg-gray-50"
+                      >
+                        <td className="px-4 py-4">
+                          <img
+                            src={wish.productId.imageSrc}
+                            alt={wish.productId.title}
+                            className="h-16 w-16 object-cover rounded-lg"
+                          />
+                        </td>
+                        <td className="px-6 py-4 font-medium text-gray-900">
+                          {wish.productId.title}
+                        </td>
+                        <td className="px-6 py-4 text-gray-700">
+                          {wish.productId.color}
+                        </td>
+                        <td className="px-6 py-4 text-gray-700">
+                          {wish.productId.quantity}
+                        </td>
+                        <td className="px-6 py-4 text-gray-700">
+                          ₹{wish.productId.price}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             ) : (
-              <p className="p-5 px-20 bg-white rounded-lg">
-                No Wish list Found
+              <p className="text-center text-gray-700 font-semibold p-6">
+                No items in your wishlist.
               </p>
             )}
           </div>
         </div>
       )}
+
       {showProfile && (
         <div className="fixed top-0 left-0 w-full h-full flex  items-center justify-center bg-gray-800 bg-opacity-50 z-50">
           <div className="bg-white p-5 lg:w-1/4 rounded-lg shadow">

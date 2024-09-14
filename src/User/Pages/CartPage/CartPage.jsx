@@ -11,6 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  clearCart,
   quantityDecrementAsync,
   quantityIncrementAsync,
   removeFromCartAsync,
@@ -52,10 +53,10 @@ export default function CartPage() {
           image: { logo },
           order_id: response.data.data.id,
           handler: async function (response) {
-            console.log(response);
-            console.log(response.razorpay_order_id);
-            console.log(response.razorpay_signature);
-            console.log(response.razorpay_payment_id);
+            // console.log(response);
+            // console.log(response.razorpay_order_id);
+            // console.log(response.razorpay_signature);
+            // console.log(response.razorpay_payment_id);
             const verificationResponse = await api.post(
               `/user/${id}/payment-verification`,
               {
@@ -64,9 +65,9 @@ export default function CartPage() {
                 razorpay_signature: response.razorpay_signature,
               }
             );
-            console.log(verificationResponse);
+            // console.log(verificationResponse);
             if (verificationResponse?.data?.success) {
-              dispatch(settingCart([]));
+              dispatch(clearCart());
               toast.success(`You Paid ₹${Subtotal} Successfully`);
               navigate("/products");
             } else {

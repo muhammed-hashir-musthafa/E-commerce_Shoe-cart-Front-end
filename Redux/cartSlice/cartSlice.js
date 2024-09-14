@@ -5,22 +5,21 @@ import api from "../../utils/axios";
 const INITIAL_STATE = {
   cart: [],
 };
-
 export const settingCart = createAsyncThunk(
   "cartSlice/settingCart",
-  async () => {
+  async (_, { rejectWithValue }) => {
     try {
       const id = localStorage.getItem("id");
       if (!id) {
-        throw new Error("User ID not found");
+        return rejectWithValue("User ID not found");
       }
 
       const res = await api.get(`/user/${id}/cart`);
-      // console.log("API response:", res.data.data.products);
+
       return res.data?.data?.products;
     } catch (error) {
-      console.log("something went wrong!", error.message);
-      throw error;
+      console.error("Something went wrong!", error.message);
+      return rejectWithValue(error.message);
     }
   }
 );
@@ -156,7 +155,11 @@ export const quantityDecrementAsync = createAsyncThunk(
 const cartSlice = createSlice({
   name: "cartSlice",
   initialState: INITIAL_STATE,
-  reducers: {},
+  reducers: {
+    clearCart: (state) => {
+      state.cart = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(settingCart.pending, (state) => {
@@ -192,4 +195,5 @@ export const {
   removeFromCart,
   quantityIncrement,
   quantityDecrement,
+  clearCart,
 } = cartSlice.actions;

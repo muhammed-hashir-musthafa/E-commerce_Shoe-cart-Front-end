@@ -27,7 +27,7 @@ export const AdminSidebar = () => {
     <>
       <header className="fixed w-full z-10">
         <nav
-          className="mx-auto flex max-w-7xl items-center justify-center p-6 sm:p-3 lg:px-8 bg-white"
+          className="mx-auto flex max-w-7xl items-center justify-center p-6 sm:p-3 lg:px-8 "
           aria-label="Global"
         >
           <img src={logo} alt="Logo" className="w-12 md:hidden me-5" />

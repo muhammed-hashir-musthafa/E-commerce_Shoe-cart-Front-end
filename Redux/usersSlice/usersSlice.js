@@ -23,7 +23,7 @@ const userSlice = createSlice({
   reducers: {
     searchFilterUser: (state, action) => {
       state.filteredUsers.data = state.users.data.filter((user) =>
-        user.name.toLowerCase().includes(action.payload.toLowerCase())
+        user.username.toLowerCase().includes(action.payload.toLowerCase())
       );
     },
     deleteUser: (state, action) => {

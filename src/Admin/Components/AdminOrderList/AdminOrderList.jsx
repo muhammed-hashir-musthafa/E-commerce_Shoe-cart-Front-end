@@ -1,22 +1,16 @@
 import { Fragment, useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import {
-  Dialog,
-  DialogPanel,
-  Transition,
-  TransitionChild,
-} from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
-import { Link } from "react-router-dom";
-import { useParams } from "react-router-dom";
-// import axios from "axios";
-// import { toast } from "react-toastify";
-import toast from "react-hot-toast";
+  XMarkIcon,
+  CalendarIcon,
+  CurrencyDollarIcon,
+} from "@heroicons/react/24/outline";
 import api from "../../../../utils/axios";
+import toast from "react-hot-toast";
 
 export default function AdminOrderList() {
   const { id } = useParams();
   const idNum = id.slice(1);
-  const userId = localStorage.getItem("id");
   const [open, setOpen] = useState(true);
   const [userOrders, setUserOrders] = useState([]);
 
@@ -24,116 +18,136 @@ export default function AdminOrderList() {
     api
       .get(`/user/${idNum}/orders`)
       .then((res) => {
-        // console.log(res.data.data.products)
-        // console.log(res.data.data);
         setUserOrders([res.data.data]);
       })
       .catch((error) => console.error(error.message));
   }, [idNum]);
 
-  // console.log(userOrders);
   return (
-    <>
-      <Transition show={open}>
-        <Dialog className="relative z-10" onClose={() => setOpen(true)}>
-          <TransitionChild
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 hidden bg-gray-500 bg-opacity-75 transition-opacity md:block" />
-          </TransitionChild>
-
-          <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-            <div className="flex min-h-full items-stretch justify-center text-center md:items-center my-8 sm:my-0 md:px-2 lg:px-4">
-              <TransitionChild
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 translate-y-4 md:translate-y-0 md:scale-95"
-                enterTo="opacity-100 translate-y-0 md:scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 translate-y-0 md:scale-100"
-                leaveTo="opacity-0 translate-y-4 md:translate-y-0 md:scale-95"
-              >
-                <DialogPanel className="items-center text-center flex w-full transform text-base transition md:my-8 md:max-w-2xl md:px-4 lg:max-w-4xl">
-                  <div className="relative w-full items-center overflow-hidden bg-white px-4 pb-8 pt-14 shadow-2xl sm:px-6 sm:pt-8 md:p-6 lg:p-8 rounded-lg">
-                    <button
-                      type="button"
-                      className="absolute right-4 top-4 text-gray-400 hover:text-gray-500 sm:right-6 sm:top-8 md:right-6 md:top-6 lg:right-8 lg:top-8"
-                      onClick={() => setOpen(false)}
-                    >
-                      <span className="sr-only">Close</span>
-                      <Link to="/admin/userslist">
-                        <XMarkIcon
-                          className="h-6 w-6 end-0"
-                          aria-hidden="true"
-                        />
-                      </Link>
-                    </button>
-                    <div className="overflow-x-auto">
-                      {userOrders.length > 0 ? (
-                        <div className="p-2 text-start">
-                          <h1 className="text-xl font-semibold mb-4">
-                            Order Details
-                          </h1>
-                          {userOrders.map((order) => (
-                            <div
-                              key={order._id}
-                              className="mb-8 p-2 bg-white shadow-lg rounded-lg border-l-4 border-indigo-600"
-                            >
-                              {/* {console.log(order)} */}
-                              <div className="mb-1">
-                                <p>Customer Name: {order.Customer_Name}</p>
-                                <p>Billing Address: {order.address}</p>
-                                <p>Billing Pincode: {order.pincode}</p>
-                              </div>
-                              <h2 className="text-base mb-2 text-rose-600">
-                                Items
-                              </h2>
-                              <ul className="space-y-4">
-                                <li className="items-center space-x-4 p-2 border rounded-lg">
-                                  <div>
-                                    {order.products.map((product) => (
-                                      <Fragment key={product._id}>
-                                        <p className="font-bold text-lg text-indigo-900">
-                                          {product.productId.title}
-                                        </p>
-                                        <p className="text-sm text-gray-600">
-                                          {product.productId.category}
-                                        </p>
-                                        <p className="font-semibold">
-                                          Price:{" "}
-                                          {product.productId.price}
-                                        </p>
-                                        <p className="font-semibold">
-                                          Quantity: {product.quantity}
-                                        </p>
-                                      </Fragment>
-                                    ))}
-                                  </div>
-                                </li>
-                              </ul>
-                              <p className="font-semibold my-5 ms-5">
-                                Paid Amount: {order.Total_Amount}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-center font-bold">
-                          No Orders founded
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </DialogPanel>
-              </TransitionChild>
-            </div>
+    <div
+      className={`fixed inset-0 bg-gray-900 bg-opacity-50 z-50 transition-opacity ${
+        open ? "opacity-100" : "opacity-0"
+      }`}
+    >
+      <div className="absolute inset-0 backdrop-blur-md bg-gray-900 bg-opacity-30" />
+      <div className="relative flex justify-center items-center h-screen p-4">
+        <div className="w-full max-w-3xl bg-white p-4 rounded-lg shadow-lg relative max-h-[90vh] overflow-y-auto">
+          <Link to="/admin/userslist">
+            <button
+              className="absolute top-3 right-3 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
+              onClick={() => setOpen(false)}
+            >
+              <XMarkIcon className="h-6 w-6" />
+            </button>
+          </Link>
+          <div className="mb-6 text-center">
+            <h1 className="text-2xl font-semibold text-gray-800">
+              Order Details
+            </h1>
           </div>
-        </Dialog>
-      </Transition>
-    </>
+
+          {userOrders.length > 0 ? (
+            <div className="space-y-4">
+              {userOrders.map((orders, index) => (
+                <div
+                  key={index}
+                  className="bg-white p-4 rounded-md shadow-md border border-gray-200"
+                >
+                  {orders.map((order, index) => (
+                    <Fragment key={order._id}>
+                      <div className="mb-4">
+                        <h2 className="text-lg font-bold text-gray-900">
+                          Order #{index + 1}
+                        </h2>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                        <div>
+                          <h2 className="text-base font-bold text-gray-900">
+                            Customer Info
+                          </h2>
+                          <p className="text-sm text-gray-700">
+                            <span className="font-semibold">Name: </span>
+                            {order.Customer_Name}
+                          </p>
+                          <p className="text-sm text-gray-700">
+                            <span className="font-semibold">Address: </span>
+                            {order.address}
+                          </p>
+                          <p className="text-sm text-gray-700">
+                            <span className="font-semibold">Pincode: </span>
+                            {order.pincode}
+                          </p>
+                        </div>
+                        {/* <div className="flex justify-end items-center">
+                          <span className="px-3 py-1 bg-green-500 text-white text-xs font-medium rounded-full">
+                            {order.status ? "Completed" : "Pending"}
+                          </span>
+                        </div> */}
+                      </div>
+
+                      <h2 className="text-base font-bold text-gray-900 mb-2">
+                        Products
+                      </h2>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {order.products.map((product) => (
+                          <div
+                            key={product._id}
+                            className="bg-gray-50 p-2 rounded-lg border"
+                          >
+                            <img
+                              src={product.productId.imageSrc}
+                              alt={product.productId.title}
+                              className="w-full h-24 object-cover rounded-md mb-2"
+                            />
+                            <p className="text-sm font-semibold text-gray-800">
+                              {product.productId.title}
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              Category: {product.productId.category}
+                            </p>
+                            <p className="text-xs text-gray-700 font-bold">
+                              Price: ₹{product.productId.price}
+                            </p>
+                            <p className="text-xs text-gray-700 font-bold">
+                              Quantity: {product.quantity}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex justify-between items-center mt-4 pt-2 pb-4 border-b border-gray-200">
+                        <div className="flex items-center space-x-1">
+                          <CalendarIcon className="h-4 w-4 text-indigo-500" />
+                          <p className="text-sm text-gray-700">
+                            {new Date(order.createdAt).toLocaleDateString()}{" "}
+                            {new Date(order.createdAt).toLocaleTimeString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <CurrencyDollarIcon className="h-4 w-4 text-green-500" />
+                          <p className="text-sm text-gray-700 font-semibold">
+                            ₹{order.Total_Amount}
+                          </p>
+                        </div>
+                        <p className="text-sm text-red-600 font-semibold">
+                          Payment ID: {order.Payment_Id}
+                        </p>
+                      </div>
+                    </Fragment>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center">
+              <p className="text-lg font-semibold text-gray-700">
+                No Orders Found
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

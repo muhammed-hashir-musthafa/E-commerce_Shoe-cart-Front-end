@@ -7,11 +7,11 @@ export const fetchProducts = createAsyncThunk(
   async () => {
     try {
       const res = await api.get("admin/products");
-      // console.log(res.data.data);
+      // console.log(res.data);
       return res.data;
     } catch (error) {
       console.log("something went wrong!");
-    }
+    } 
   }
 );
 
@@ -77,7 +77,7 @@ const productSlice = createSlice({
         // console.log("Succes");
         state.products = action.payload;
         state.filteredProducts = action.payload;
-        // console.log(action.payload);
+        // console.log(action.payload.data);
       });
   },
 });
