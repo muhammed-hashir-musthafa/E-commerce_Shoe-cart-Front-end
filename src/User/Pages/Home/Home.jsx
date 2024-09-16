@@ -55,9 +55,9 @@ export default function Home() {
         setUserWish(wishlist);
       }
     }
-  }, [userLogin, filteredUsers]);
+  }, [userLogin, filteredUsers, wishlist]);
 
-  // console.log(userWish);
+  // console.log(wishlist);
   // console.log(userOrders);
   const handleShowOrders = () => {
     setShowOrders(true);
@@ -75,44 +75,49 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const validationSchema = yup.object({
-    address: yup.string().required("Email is required"),
+    address: yup.string().required("Address is required"),
+    city: yup.string().required("City is Required"),
+    state: yup.string().required("State is Required"),
+    contact: yup
+      .string()
+      .required("Contact is Required")
+      .matches(/^\d{10}$/, "Contact must be 10 digits"), // Validate length and digits
     pincode: yup
       .string()
       .required("Pin Code is required")
       .matches(/^[1-9][0-9]{5}$/, "Invalid Pin Code"),
   });
+  // console.log(user);
 
   const handleSubmit = async (values, { resetForm }) => {
     try {
-      const user = filteredUsers.find((user) => user.id === userLogin);
-      const preAddress = await api.get(`/User/${user.id}`);
-      // const prevAddress = preAddress.data.address;
-      // const prevPin = preAddress.data.pincode
-      const currentAddress = Array.isArray(values.address)
-        ? values.address
-        : [values.address];
-      const pincode = Array.isArray(values.pincode)
-        ? values.pincode
-        : [values.pincode];
-      // console.log(pincode);
-      // const updatedAddress = [...currentAddress, ...prevAddress];
-      // const updatedPincode =[...pincode,...prevPin]
+      const updateUser = {
+        address: values.address,
+        city: values.city,
+        state: values.state,
+        contact: values.contact,
+        pincode: values.pincode,
+      };
+
       await api
-        .patch(`/user/${user.id}`, {
-          address: currentAddress,
-          pincode: pincode,
+        .patch(`/user/${user._id}/updateinfo`, updateUser)
+        .then(() => {
+          console.log("Update successful");
+          toast.success("Address updated successfully");
         })
-        .then(() => console.log("success"))
-        .catch((err) => console.log(err.message));
+        .catch((err) => {
+          console.log("Error updating", err.message);
+          // toast.error("Update failed");
+        });
+
       resetForm();
-      toast.success("Address updated successfully");
       setShowProfile(false);
     } catch (err) {
-      toast.error("Something went wrong");
+      console.log("Error caught", err);
+      // toast.error("Something went wrong");
     }
   };
 
-  // console.log(user);
   return (
     <>
       <header className="bg-white ">
@@ -259,7 +264,7 @@ export default function Home() {
                           "block px-4 py-2 text-sm text-gray-700"
                         )}
                       >
-                        Update Address
+                        Update Info
                       </a>
                     )}
                   </MenuItem>
@@ -548,8 +553,8 @@ export default function Home() {
       )}
 
       {showProfile && (
-        <div className="fixed top-0 left-0 w-full h-full flex  items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-white p-5 lg:w-1/4 rounded-lg shadow">
+        <div className="fixed top-0 left-0 w-full h-full flex  items-center justify-center bg-gray-800 bg-opacity-50 z-50 backdrop-blur-lg ">
+          <div className="bg-white p-5 lg:w-1/4 rounded-lg shadow overflow-y-auto">
             <button
               type="button"
               onClick={() => setShowProfile(false)}
@@ -558,9 +563,15 @@ export default function Home() {
               <span className="sr-only">Close</span>
               <XMarkIcon className="h-6 w-6 end-0" aria-hidden="true" />
             </button>
-            <h3 className="text-center font-bold text-xl p-3">Enter Address</h3>
+            <h3 className="text-center font-bold text-xl p-3">Enter Details</h3>
             <Formik
-              initialValues={{ address: "", pincode: "" }}
+              initialValues={{
+                address: `${user.address}`,
+                city: `${user.city}`,
+                state: `${user.state}`,
+                contact: `${user.contact}`,
+                pincode: `${user.pincode}`,
+              }}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
@@ -571,7 +582,7 @@ export default function Home() {
                       htmlFor="address"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
-                      Enter Address
+                      Address
                     </label>
                     <div className="mt-2 mb-4">
                       <Field
@@ -579,7 +590,6 @@ export default function Home() {
                         name="address"
                         type="text"
                         placeholder="Enter Address"
-                        autoComplete="email"
                         className="block w-full pl-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
                       <ErrorMessage
@@ -590,10 +600,72 @@ export default function Home() {
                     </div>
 
                     <label
+                      htmlFor="city"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      City
+                    </label>
+                    <div className="mt-2 mb-4">
+                      <Field
+                        id="city"
+                        name="city"
+                        type="text"
+                        placeholder="Enter City"
+                        className="block w-full pl-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      />
+                      <ErrorMessage
+                        name="city"
+                        component="div"
+                        className="text-red-500 text-sm"
+                      />
+                    </div>
+
+                    <label
+                      htmlFor="state"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      State
+                    </label>
+                    <div className="mt-2 mb-4">
+                      <Field
+                        id="state"
+                        name="state"
+                        type="text"
+                        placeholder="Enter State"
+                        className="block w-full pl-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      />
+                      <ErrorMessage
+                        name="state"
+                        component="div"
+                        className="text-red-500 text-sm"
+                      />
+                    </div>
+                    <label
+                      htmlFor="contact"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      Contact No.
+                    </label>
+                    <div className="mt-2 mb-4">
+                      <Field
+                        id="contact"
+                        name="contact"
+                        type="text"
+                        placeholder="Enter Contact"
+                        className="block w-full pl-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      />
+                      <ErrorMessage
+                        name="contact"
+                        component="div"
+                        className="text-red-500 text-sm"
+                      />
+                    </div>
+
+                    <label
                       htmlFor="pincode"
                       className="block text-sm font-medium leading-6  text-gray-900"
                     >
-                      Enter Pin Code
+                      Pin Code
                     </label>
                     <div className="mt-2">
                       <Field

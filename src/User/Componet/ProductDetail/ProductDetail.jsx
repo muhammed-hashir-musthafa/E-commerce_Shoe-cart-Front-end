@@ -37,11 +37,11 @@ export default function ProductDetail() {
   const { products } = useSelector((state) => state.productSlice);
   // const { addToCart, products } = useContext(CartContext);
   const { id } = useParams();
-  const idNum = id.slice(1);
+  const idNum = id.slice();
 
   const product = products?.data?.find((item) => item._id === idNum);
 
-  // console.log(product);
+  // console.log(products);
 
   const [open, setOpen] = useState(true);
   const [selectedColor, setSelectedColor] = useState(product1.colors[0]);
@@ -140,7 +140,6 @@ export default function ProductDetail() {
                           </h3>
 
                           <form>
-                            {/* Colors */}
                             <fieldset aria-label="Choose a color">
                               <legend className="text-sm font-medium text-gray-900">
                                 Color
@@ -179,7 +178,6 @@ export default function ProductDetail() {
                               </RadioGroup>
                             </fieldset>
 
-                            {/* Sizes */}
                             <fieldset
                               className="mt-10"
                               aria-label="Choose a size"
