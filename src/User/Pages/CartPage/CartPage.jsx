@@ -50,7 +50,7 @@ export default function CartPage() {
           currency: "INR",
           name: "Kazpix",
           description: "Test Transaction",
-          image: { logo },
+          image: "../../../Assets/logo png 3.png",
           order_id: response.data.data.id,
           handler: async function (response) {
             // console.log(response);
