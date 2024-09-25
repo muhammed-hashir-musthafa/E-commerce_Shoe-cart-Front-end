@@ -133,6 +133,9 @@ export default function AdminOrderList() {
                         <p className="text-sm text-red-600 font-semibold">
                           Payment ID: {order.Payment_Id}
                         </p>
+                        <p className="text-sm text-green-600 font-semibold">
+                          Order ID: {order.order_Id}
+                        </p>
                       </div>
                     </Fragment>
                   ))}
