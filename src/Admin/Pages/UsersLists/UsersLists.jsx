@@ -6,6 +6,7 @@ import { deleteUser } from "../../../../Redux/usersSlice/usersSlice";
 import api from "../../../../utils/axios";
 import { useEffect, useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import React from "react";
 
 export default function UsersLists() {
   const navigate = useNavigate();

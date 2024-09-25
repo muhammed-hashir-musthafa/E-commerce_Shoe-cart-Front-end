@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Dialog,
   DialogPanel,
@@ -20,9 +20,9 @@ export default function AdminUserCart() {
   const idNum = id.slice(1);
   const user = users.find((item) => item._id === idNum);
   const [open, setOpen] = useState(true);
- 
+
   const { cart } = useSelector((state) => state.cartSlice);
-  
+
   const Subtotal = cart?.reduce((total, product) => {
     return total + product.productId.price * product.quantity;
   }, 0);
