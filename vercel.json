@@ -4,16 +4,16 @@
     {
       "src": "package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
+      "config": { "distDir": "dist" }   
     },
     {
-      "src": "/api/db.json",  
+      "src": "api/db.json",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/db.json",  
+      "src": "/api/db.json",
       "dest": "/api/db.json"
     },
     {
@@ -21,8 +21,8 @@
       "dest": "/api/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/"
+      "src": "/(.*)",  
+      "dest": "/index.html"
     }
   ]
 }
