@@ -1,3 +1,4 @@
+import React from 'react';
 import ProductDetails from "./User/Componet/ProductDetail/ProductDetail";
 import CartPage from "./User/Pages/CartPage/CartPage";
 import Home from "./User/Pages/Home/Home";
