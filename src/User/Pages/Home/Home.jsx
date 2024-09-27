@@ -1,7 +1,6 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import logo from "../../../Assets/Logo.png";
 import fontLogo from "../../../Assets/font.png";
-import React from 'react';
 import { Link } from "react-router-dom";
 import {
   Dialog,
@@ -116,6 +115,25 @@ export default function Home() {
     } catch (err) {
       console.log("Error caught", err);
       // toast.error("Something went wrong");
+    }
+  };
+
+  const [loading, setLoading] = useState(false);
+
+  const handleRefundRequest = async (orderId) => {
+    
+    try {
+      setLoading(true);
+      const response = await api.post(`/user/order/${orderId}/refund`);
+      if (response.data.success) {
+        toast.success("Refund request submitted!");
+      } else {
+        toast.error("Refund request failed");
+      }
+    } catch (error) {
+      toast.error("Error submitting refund request");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -392,9 +410,10 @@ export default function Home() {
           </DialogPanel>
         </Dialog>
       </header>
+
       {showOrders && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-70 z-50 backdrop-blur-lg">
-          <div className="relative bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto ">
+          <div className="relative bg-white rounded-lg shadow-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto p-8">
             <button
               type="button"
               onClick={() => setShowOrders(false)}
@@ -404,150 +423,90 @@ export default function Home() {
               <XMarkIcon className="h-6 w-6" aria-hidden="true" />
             </button>
 
-            <div className="p-6">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                Order Details
-              </h2>
+            <h2 className="text-3xl font-semibold text-gray-900 mb-6 text-center">
+              Order Details
+            </h2>
 
-              {userOrders?.length > 0 ? (
-                <table className="min-w-full divide-y divide-gray-200 bg-white text-sm rounded-lg">
-                  <thead className="bg-gray-100 text-gray-600">
-                    <tr>
-                      <th className="whitespace-nowrap px-4 py-3 font-medium text-left">
-                        Image
-                      </th>
-                      <th className="whitespace-nowrap px-4 py-3 font-medium text-left">
-                        Product Title
-                      </th>
-                      <th className="whitespace-nowrap px-4 py-3 font-medium text-left">
-                        Product Color
-                      </th>
-                      <th className="whitespace-nowrap px-4 py-3 font-medium text-left">
-                        Quantity
-                      </th>
-                      <th className="whitespace-nowrap px-4 py-3 font-medium text-left">
-                        Price
-                      </th>
-                      <th className="whitespace-nowrap px-4 py-3 font-medium text-left">
-                        Total
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {userOrders.map((orders, index) => (
-                      <Fragment key={index}>
-                        {orders.map((order) => (
-                          <Fragment key={order._id}>
-                            {order.products.map((product) => (
-                              <tr key={product._id} className="odd:bg-gray-50">
-                                <td className="whitespace-nowrap px-4 py-4 text-gray-900">
+            {userOrders.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+                {userOrders
+                  .flatMap((innerArray) => innerArray)
+                  .map((order) => {
+                    // Determine if the order is delivered
+                    const isDelivered = order.products.every(
+                      (product) => product.isDelivered
+                    );
+                    return (
+                      <div
+                        key={order._id}
+                        className="bg-white shadow-lg rounded-lg overflow-hidden flex flex-col justify-between"
+                        style={{ minHeight: "350px" }} // Ensure all boxes are the same height
+                      >
+                        <div className="p-4">
+                          {order.products.map((product) => (
+                            <Fragment key={product._id}>
+                              <div className="flex items-center justify-between mb-4">
+                                <div className="w-24 h-24">
                                   <img
                                     src={product.productId.imageSrc}
                                     alt={product.productId.title}
-                                    className="w-16 h-16 object-cover rounded-md"
+                                    className="w-full h-full object-cover rounded-lg"
                                   />
-                                </td>
-                                <td className="whitespace-nowrap px-4 py-4 text-gray-900 font-medium">
-                                  {product.productId.title}
-                                </td>
-                                <td className="whitespace-nowrap px-4 py-4 text-gray-700">
-                                  {product.productId.color}
-                                </td>
-                                <td className="whitespace-nowrap px-4 py-4 text-gray-700">
-                                  {product.quantity}
-                                </td>
-                                <td className="whitespace-nowrap px-4 py-4 text-gray-700">
-                                  ₹{product.productId.price}
-                                </td>
-                                <td className="whitespace-nowrap px-4 py-4 text-gray-700">
-                                  ₹{product.productId.price * product.quantity}
-                                </td>
-                              </tr>
-                            ))}
-                          </Fragment>
-                        ))}
-                      </Fragment>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p className="p-5 text-center text-gray-700">No Orders Found</p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-      {showWishList && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-70 z-50 backdrop-blur-lg">
-          <div className="relative bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6">
-            <button
-              type="button"
-              onClick={() => setShowWishList(false)}
-              className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full focus:outline-none"
-            >
-              <span className="sr-only">Close</span>
-              <XMarkIcon className="h-5 w-5" aria-hidden="true" />
-            </button>
+                                </div>
+                                <div className="ml-4 flex-1">
+                                  <h3 className="text-lg font-semibold text-gray-900">
+                                    {product.productId.title}
+                                  </h3>
+                                  <p className="text-gray-700">
+                                    Color: {product.productId.color}
+                                  </p>
+                                  <p className="text-gray-700">
+                                    Quantity: {product.quantity}
+                                  </p>
+                                  <p className="text-gray-700">
+                                    Price: ₹{product.productId.price}
+                                  </p>
+                                  <p className="text-gray-700">
+                                    Total: ₹
+                                    {product.productId.price * product.quantity}
+                                  </p>
+                                </div>
+                              </div>
+                            </Fragment>
+                          ))}
+                        </div>
 
-            <h2 className="text-2xl font-semibold text-gray-800 text-center mb-4">
-              Your Wishlist
-            </h2>
-            {userWish?.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 text-sm text-left bg-gray-50 shadow-lg rounded-lg">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th className="px-4 py-3 text-gray-700 font-semibold">
-                        Product Image
-                      </th>
-                      <th className="px-6 py-3 text-gray-700 font-semibold">
-                        Product Title
-                      </th>
-                      <th className="px-6 py-3 text-gray-700 font-semibold">
-                        Product Color
-                      </th>
-                      <th className="px-6 py-3 text-gray-700 font-semibold">
-                        Product Quantity
-                      </th>
-                      <th className="px-6 py-3 text-gray-700 font-semibold">
-                        Product Price
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {userWish?.map((wish) => (
-                      <tr
-                        key={wish._id}
-                        className="odd:bg-white even:bg-gray-50"
-                      >
-                        <td className="px-4 py-4">
-                          <img
-                            src={wish.productId.imageSrc}
-                            alt={wish.productId.title}
-                            className="h-16 w-16 object-cover rounded-lg"
-                          />
-                        </td>
-                        <td className="px-6 py-4 font-medium text-gray-900">
-                          {wish.productId.title}
-                        </td>
-                        <td className="px-6 py-4 text-gray-700">
-                          {wish.productId.color}
-                        </td>
-                        <td className="px-6 py-4 text-gray-700">
-                          {wish.productId.quantity}
-                        </td>
-                        <td className="px-6 py-4 text-gray-700">
-                          ₹{wish.productId.price}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        {/* Single Status for the Whole Order */}
+                        <div className="p-4 bg-gray-100 mt-auto flex flex-col items-center">
+                          <p
+                            className={`text-sm ${
+                              isDelivered ? "text-green-500" : "text-yellow-500"
+                            }`}
+                          >
+                            Status: {isDelivered ? "Delivered" : "Pending"}
+                          </p>
+                          {!order.isRefundRequested && !isDelivered ? (
+                            <button
+                              className="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md shadow-md transition duration-200"
+                              onClick={() => handleRefundRequest(order._id)}
+                              disabled={loading}
+                            >
+                              {loading ? "Requesting..." : "Cancel Order"}
+                            </button>
+                          ) : (
+                            <span className="text-gray-500">
+                              {isDelivered
+                                ? "Order Delivered"
+                                : "Order Canceled"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             ) : (
-              <p className="text-center text-gray-700 font-semibold p-6">
-                No items in your wishlist.
-              </p>
+              <p className="p-5 text-center text-gray-700">No Orders Found</p>
             )}
           </div>
         </div>
