@@ -121,7 +121,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const handleRefundRequest = async (orderId) => {
-    
+    console.log(orderId)
     try {
       setLoading(true);
       const response = await api.post(`/user/order/${orderId}/refund`);
@@ -479,9 +479,8 @@ export default function Home() {
                         {/* Single Status for the Whole Order */}
                         <div className="p-4 bg-gray-100 mt-auto flex flex-col items-center">
                           <p
-                            className={`text-sm ${
-                              isDelivered ? "text-green-500" : "text-yellow-500"
-                            }`}
+                            className={`text-sm ${isDelivered ? "text-green-500" : "text-yellow-500"
+                              }`}
                           >
                             Status: {isDelivered ? "Delivered" : "Pending"}
                           </p>
