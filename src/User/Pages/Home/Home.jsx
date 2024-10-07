@@ -81,7 +81,7 @@ export default function Home() {
     contact: yup
       .string()
       .required("Contact is Required")
-      .matches(/^\d{10}$/, "Contact must be 10 digits"), // Validate length and digits
+      .matches(/^\d{10}$/, "Contact must be 10 digits"),
     pincode: yup
       .string()
       .required("Pin Code is required")
@@ -120,22 +120,24 @@ export default function Home() {
 
   const [loading, setLoading] = useState(false);
 
-  const handleRefundRequest = async (orderId) => {
-    console.log(orderId)
-    try {
-      setLoading(true);
-      const response = await api.post(`/user/order/${orderId}/refund`);
-      if (response.data.success) {
-        toast.success("Refund request submitted!");
-      } else {
-        toast.error("Refund request failed");
-      }
-    } catch (error) {
-      toast.error("Error submitting refund request");
-    } finally {
-      setLoading(false);
+const handleRefundRequest = async (orderId) => {
+  try {
+    setLoading(true);
+    const response = await api.post(`/user/order/${orderId}/refund`);
+
+    if (response.data.success) {
+      toast.success("Refund request submitted!");
+    } else {
+      toast.error(response.data.message || "Refund request failed.");
     }
-  };
+  } catch (error) {
+    console.error("Error in handleRefundRequest:", error);  // Log the error for debugging
+    toast.error("Error submitting refund request. Please try again later.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <>
@@ -432,7 +434,6 @@ export default function Home() {
                 {userOrders
                   .flatMap((innerArray) => innerArray)
                   .map((order) => {
-                    // Determine if the order is delivered
                     const isDelivered = order.products.every(
                       (product) => product.isDelivered
                     );
@@ -440,7 +441,7 @@ export default function Home() {
                       <div
                         key={order._id}
                         className="bg-white shadow-lg rounded-lg overflow-hidden flex flex-col justify-between"
-                        style={{ minHeight: "350px" }} // Ensure all boxes are the same height
+                        style={{ minHeight: "350px" }}
                       >
                         <div className="p-4">
                           {order.products.map((product) => (
@@ -476,8 +477,7 @@ export default function Home() {
                           ))}
                         </div>
 
-                        {/* Single Status for the Whole Order */}
-                        <div className="p-4 bg-gray-100 mt-auto flex flex-col items-center">
+                         <div className="p-4 bg-gray-100 mt-auto flex flex-col items-center">
                           <p
                             className={`text-sm ${isDelivered ? "text-green-500" : "text-yellow-500"
                               }`}
@@ -506,6 +506,82 @@ export default function Home() {
               </div>
             ) : (
               <p className="p-5 text-center text-gray-700">No Orders Found</p>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {showWishList && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-70 z-50 backdrop-blur-lg">
+          <div className="relative bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6">
+            <button
+              type="button"
+              onClick={() => setShowWishList(false)}
+              className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full focus:outline-none"
+            >
+              <span className="sr-only">Close</span>
+              <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+            </button>
+
+            <h2 className="text-2xl font-semibold text-gray-800 text-center mb-4">
+              Your Wishlist
+            </h2>
+            {userWish?.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200 text-sm text-left bg-gray-50 shadow-lg rounded-lg">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-4 py-3 text-gray-700 font-semibold">
+                        Product Image
+                      </th>
+                      <th className="px-6 py-3 text-gray-700 font-semibold">
+                        Product Title
+                      </th>
+                      <th className="px-6 py-3 text-gray-700 font-semibold">
+                        Product Color
+                      </th>
+                      <th className="px-6 py-3 text-gray-700 font-semibold">
+                        Product Quantity
+                      </th>
+                      <th className="px-6 py-3 text-gray-700 font-semibold">
+                        Product Price
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {userWish?.map((wish) => (
+                      <tr
+                        key={wish._id}
+                        className="odd:bg-white even:bg-gray-50"
+                      >
+                        <td className="px-4 py-4">
+                          <img
+                            src={wish.productId.imageSrc}
+                            alt={wish.productId.title}
+                            className="h-16 w-16 object-cover rounded-lg"
+                          />
+                        </td>
+                        <td className="px-6 py-4 font-medium text-gray-900">
+                          {wish.productId.title}
+                        </td>
+                        <td className="px-6 py-4 text-gray-700">
+                          {wish.productId.color}
+                        </td>
+                        <td className="px-6 py-4 text-gray-700">
+                          {wish.productId.quantity}
+                        </td>
+                        <td className="px-6 py-4 text-gray-700">
+                          ₹{wish.productId.price}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-center text-gray-700 font-semibold p-6">
+                No items in your wishlist.
+              </p>
             )}
           </div>
         </div>
