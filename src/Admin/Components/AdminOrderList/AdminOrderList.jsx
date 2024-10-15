@@ -53,9 +53,11 @@ export default function AdminOrderList() {
                   key={index}
                   className="bg-white p-4 rounded-md shadow-md border border-gray-200"
                 >
+                  {/* {console.log(orders)} */}
                   {orders.map((order, index) => (
                     <Fragment key={order._id}>
                       <div className="mb-4">
+                        {console.log(order)}
                         <h2 className="text-lg font-bold text-gray-900">
                           Order #{index + 1}
                         </h2>
