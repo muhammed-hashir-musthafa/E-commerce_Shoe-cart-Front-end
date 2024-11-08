@@ -70,7 +70,7 @@ function App() {
 
   setInterval(() => {
     dispatch(fetchProducts());
-  }, 900000);
+  }, 180000);
 
   // console.log(users);
   // console.log(products);
