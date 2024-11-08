@@ -68,6 +68,10 @@ function App() {
     }
   }, [userId, isLogged, dispatch]);
 
+  setInterval(() => {
+    dispatch(fetchProducts());
+  }, 900000);
+
   // console.log(users);
   // console.log(products);
   // console.log(filteredProducts);
