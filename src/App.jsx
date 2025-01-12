@@ -30,6 +30,7 @@ import { settingCart } from "../Redux/cartSlice/cartSlice";
 import { login } from "../Redux/logSlice/logSlice";
 import { Toaster } from "react-hot-toast";
 import { settingWishList } from "../Redux/wishlistSlice/wishlistSlice";
+import { startCronJob } from '../utils/cronJob';
 
 function App() {
   const id = localStorage.getItem("id");
@@ -59,6 +60,7 @@ function App() {
     if (userId) {
       dispatch(login({ id: userId }));
     }
+    startCronJob();
   }, []);
 
   useEffect(() => {
